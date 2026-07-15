@@ -1,10 +1,10 @@
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-// Adding 'async' turns this into a Next.js Server Component
 export default async function Home() {
-  // We securely check the authentication status directly on the server
+  // Securely check the authentication status directly on the server
   const { userId } = await auth();
 
   return (
@@ -24,9 +24,11 @@ export default async function Home() {
           {/* If there is a userId, the user is LOGGED IN */}
           {userId ? (
             <div className="flex items-center gap-4">
-              <Button size="lg" variant="outline" className="text-black border-zinc-700 hover:bg-zinc-100">
-                Go to Dashboard
-              </Button>
+              <Link href="/dashboard">
+                <Button size="lg" variant="outline" className="text-black border-zinc-700 hover:bg-zinc-100">
+                  Go to Dashboard
+                </Button>
+              </Link>
               <UserButton afterSignOutUrl="/" />
             </div>
           ) : (
