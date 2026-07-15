@@ -29,7 +29,7 @@ export default async function Home() {
                   Go to Dashboard
                 </Button>
               </Link>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton/>
             </div>
           ) : (
             // If there is NO userId, the user is LOGGED OUT
