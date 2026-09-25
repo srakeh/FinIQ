@@ -1,0 +1,156 @@
+"use client";
+
+import { useState } from "react";
+import { FileText, ExternalLink, Bot, Loader2, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { extractTextFromDocument } from "@/actions/analyze";
+import { deleteDocument } from "@/actions/document";
+
+// Define the exact shape of the new financial data
+interface AnalysisResult {
+  documentType: string;
+  accountHolder: string;
+  netIncome: string;
+  taxDeductions: string;
+  portfolioValue: string;
+}
+
+// Define the incoming Prisma document structure
+interface DocumentProps {
+  id: string;
+  title: string;
+  fileUrl: string;
+  createdAt: Date;
+  fileType: string;
+}
+
+export function DocumentCard({ doc }: { doc: DocumentProps }) {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [error, setError] = useState("");
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    setError("");
+    try {
+      // Call the Server Action
+      const result = await extractTextFromDocument(doc.fileUrl);
+      if (result.success && result.data) {
+        setAnalysis(result.data);
+      }
+    } catch (err) {
+      setError("Failed to analyze document. Please try again.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteDocument(doc.id);
+      // We don't need to set isDeleting to false on success because the card will instantly unmount
+    } catch (err) {
+      console.error(err);
+      setIsDeleting(false);
+    }
+  };
+  
+  return (
+    <Card className="overflow-hidden hover:shadow-md transition-shadow dark:border-zinc-800">
+      <CardContent className="p-4 flex flex-col gap-4">
+        {/* Top Row: File Info */}
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+            <FileText className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+              {doc.title}
+            </p>
+            <p className="text-xs text-zinc-500 truncate mt-0.5">
+              {new Date(doc.createdAt).toLocaleDateString()} • {doc.fileType.toUpperCase()}
+            </p>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1">
+            <a
+              href={doc.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
+              title="Open Original Document"
+            >
+              <ExternalLink className="h-4 w-4 text-zinc-500" />
+            </a>
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 text-zinc-500 hover:text-red-600 rounded-md transition-colors"
+              title="Delete Document"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* AI Action Button */}
+        {!analysis && (
+          <button
+            onClick={handleAnalyze}
+            disabled={isAnalyzing}
+            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-zinc-900 text-white rounded-md text-sm font-medium hover:bg-zinc-800 disabled:opacity-50 transition-colors dark:bg-zinc-50 dark:text-zinc-900"
+          >
+            {isAnalyzing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Bot className="h-4 w-4" />
+            )}
+            {isAnalyzing ? "Extracting Data..." : "Analyze with AI"}
+          </button>
+        )}
+
+        {/* Error State */}
+        {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+
+        {/* AI Results Display */}
+        {analysis && (
+          <div className="mt-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 space-y-2">
+            <div className="flex items-center gap-2 mb-3">
+              <Bot className="h-4 w-4 text-emerald-600" />
+              <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-50">Financial Extraction</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-zinc-500 block">Account Holder</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">{analysis.accountHolder}</span>
+              </div>
+              <div>
+                <span className="text-zinc-500 block">Document</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">{analysis.documentType}</span>
+              </div>
+              <div>
+                <span className="text-zinc-500 block">Net Income</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">{analysis.netIncome}</span>
+              </div>
+              <div>
+                <span className="text-zinc-500 block">Tax Deductions</span>
+                <span className="font-medium text-zinc-900 dark:text-zinc-50">{analysis.taxDeductions}</span>
+              </div>
+              <div className="col-span-2 mt-1">
+                <span className="text-zinc-500 block">Portfolio Value</span>
+                <span className="text-zinc-700 dark:text-zinc-300">{analysis.portfolioValue}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

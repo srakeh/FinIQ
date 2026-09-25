@@ -16,7 +16,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relationships
-  documents           Document[]
   quizAttempts        QuizAttempt[]
   investmentProfile   InvestmentProfile?
   startups Startup[]
@@ -24,14 +23,17 @@ model User {
 
 model Document {
   id        String   @id @default(uuid())
-  userId    String
+  userId    String   // This will securely store the Clerk ID
   title     String
   fileUrl   String
   fileType  String
   createdAt DateTime @default(now())
 
-  // If a User is deleted, delete their documents too (Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentType   String?
+  accountHolder  String?
+  netIncome      String?
+  taxDeductions  String?
+  portfolioValue String?
 }
 
 model InvestmentProfile {
