@@ -3,7 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { supabase } from "@/lib/supabase"; // Added Supabase client
+import { supabase } from "@/lib/supabase"; 
 
 // 1. The Save function (Unchanged)
 export async function saveDocumentRecord(title: string, fileUrl: string, fileType: string) {
@@ -28,21 +28,20 @@ export async function saveDocumentRecord(title: string, fileUrl: string, fileTyp
   }
 }
 
-// 2. The Delete function (Updated with Supabase Cleanup)
+// 2. The Delete function 
 export async function deleteDocument(id: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
   try {
-    // A. Find the document first to get its fileUrl
-    const doc = await prisma.document.findUnique({
+    // A. Use findFirst to safely check both id and userId
+    const doc = await prisma.document.findFirst({
       where: { id: id, userId: userId },
     });
 
     if (!doc) throw new Error("Document not found");
 
     // B. Extract the exact filename from the Supabase public URL
-    // Splits: https://[project].supabase.co/storage/v1/object/public/documents/filename.pdf
     const urlParts = doc.fileUrl.split('/public/documents/');
     
     if (urlParts.length === 2) {
@@ -56,16 +55,12 @@ export async function deleteDocument(id: string) {
 
       if (storageError) {
         console.error("Failed to delete from Supabase bucket:", storageError);
-        // We log the error but proceed to clean up the database anyway so the UI doesn't break
       }
     }
 
-    // D. Delete the record from PostgreSQL
+    // D. Delete the record from PostgreSQL (only requires id since we verified ownership above)
     await prisma.document.delete({
-      where: { 
-        id: id,
-        userId: userId 
-      },
+      where: { id: id },
     });
 
     // Refresh the dashboard page instantly
@@ -74,5 +69,31 @@ export async function deleteDocument(id: string) {
   } catch (error) {
     console.error("Delete Error:", error);
     throw new Error("Failed to delete document");
+  }
+}
+
+// 3. The Analytics Save function
+export async function saveDocumentAnalysis(id: string, analysisData: any) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    // Use updateMany so we can safely filter by both id and userId 
+    await prisma.document.updateMany({
+      where: { id: id, userId: userId },
+      data: {
+        documentType: analysisData.documentType,
+        accountHolder: analysisData.accountHolder,
+        netIncome: analysisData.netIncome,
+        taxDeductions: analysisData.taxDeductions,
+        portfolioValue: analysisData.portfolioValue,
+      },
+    });
+    
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to save analysis:", error);
+    throw new Error("Database update failed");
   }
 }
