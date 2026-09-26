@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { DocumentCard } from "@/components/features/document-card";
 import { ExportButton } from "@/components/features/export-button";
-import { FinancialChart } from "@/components/features/financial-chart";
 import { IndianRupee, TrendingDown, Wallet } from "lucide-react"; 
 
 function parseCurrency(val: string | null) {
@@ -73,8 +72,8 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <>
-          <FinancialChart documents={documents} />
-          
+        
+                  
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {documents.map((doc) => (
               <DocumentCard key={doc.id} doc={doc} />
