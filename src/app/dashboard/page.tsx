@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { DocumentCard } from "@/components/features/document-card";
+import { ExportButton } from "@/components/features/export-button";
+import { IndianRupee, TrendingDown, Wallet } from "lucide-react";
 
 export default async function DashboardPage() {
   // 1. Authenticate the user
@@ -21,13 +23,19 @@ export default async function DashboardPage() {
   // 3. Render the UI
   return (
     <main className="max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          Investor Dashboard
-        </h1>
-        <p className="text-zinc-500 mt-1">
-          Manage your uploaded pitch decks and run AI analysis.
-        </p>
+      
+      {/* UPDATED HEADER WITH EXPORT BUTTON */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+            Financial Dashboard
+          </h1>
+          <p className="text-zinc-500 mt-1">
+            Manage your financial documents and track AI-extracted insights.
+          </p>
+        </div>
+        
+        <ExportButton documents={documents} />
       </div>
 
       {documents.length === 0 ? (

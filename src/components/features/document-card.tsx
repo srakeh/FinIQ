@@ -5,6 +5,7 @@ import { FileText, ExternalLink, Bot, Loader2, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { extractTextFromDocument } from "@/actions/analyze";
 import { deleteDocument, saveDocumentAnalysis } from "@/actions/document";
+import { toast } from "sonner"; // 1. Import toast
 
 interface AnalysisResult {
   documentType: string;
@@ -14,6 +15,7 @@ interface AnalysisResult {
   portfolioValue: string;
 }
 
+// ... DocumentProps interface remains exactly the same ...
 interface DocumentProps {
   id: string;
   title: string;
@@ -30,7 +32,6 @@ interface DocumentProps {
 export function DocumentCard({ doc }: { doc: DocumentProps }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState("");
   
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(
     doc.netIncome ? {
@@ -44,15 +45,20 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
-    setError("");
+    // 2. Trigger loading toast
+    const toastId = toast.loading("Analyzing document with Gemini AI...");
+    
     try {
       const result = await extractTextFromDocument(doc.fileUrl);
       if (result.success && result.data) {
         setAnalysis(result.data);
         await saveDocumentAnalysis(doc.id, result.data);
+        // 3. Update to success toast
+        toast.success("Analysis complete! Data saved.", { id: toastId });
       }
     } catch (err) {
-      setError("Failed to analyze document. Please try again.");
+      // 4. Update to error toast
+      toast.error("Failed to analyze document. Please try again.", { id: toastId });
     } finally {
       setIsAnalyzing(false);
     }
@@ -60,10 +66,13 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
 
   const handleDelete = async () => {
     setIsDeleting(true);
+    const toastId = toast.loading("Deleting document...");
     try {
       await deleteDocument(doc.id);
+      toast.success("Document deleted successfully", { id: toastId });
     } catch (err) {
       console.error(err);
+      toast.error("Failed to delete document", { id: toastId });
       setIsDeleting(false);
     }
   };
@@ -98,8 +107,6 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
             {isAnalyzing ? "Extracting Data..." : "Analyze with AI"}
           </button>
         )}
-
-        {error && <p className="text-xs text-red-500 text-center">{error}</p>}
 
         {analysis && (
           <div className="mt-2 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-md border border-zinc-200 dark:border-zinc-800 space-y-2">
