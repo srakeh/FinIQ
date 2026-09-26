@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   if (!userId) redirect("/sign-in");
 
   // 2. Fetch documents for this specific user directly from PostgreSQL
-  const documents = await prisma.document.findMany({
+  const documents: any[] = await prisma.document.findMany({
     where: {
       userId: userId,
     },
