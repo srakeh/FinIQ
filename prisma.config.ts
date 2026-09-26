@@ -1,8 +1,8 @@
 import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import { definePrismaConfig} from "prisma/config";
 
-export default defineConfig({
+export default definePrismaConfig({
   datasource: {
-    url: env("DIRECT_URL"),
+    url: process.env.DIRECT_URL,
   },
 });
