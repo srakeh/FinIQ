@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // 1. Add this import
 import { FileText, ExternalLink, Bot, Loader2, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { extractTextFromDocument } from "@/actions/analyze";
 import { deleteDocument, saveDocumentAnalysis } from "@/actions/document";
-import { toast } from "sonner"; // 1. Import toast
+import { toast } from "sonner";
 
+// ... interfaces stay exactly the same ...
 interface AnalysisResult {
   documentType: string;
   accountHolder: string;
@@ -15,7 +17,6 @@ interface AnalysisResult {
   portfolioValue: string;
 }
 
-// ... DocumentProps interface remains exactly the same ...
 interface DocumentProps {
   id: string;
   title: string;
@@ -30,6 +31,7 @@ interface DocumentProps {
 }
 
 export function DocumentCard({ doc }: { doc: DocumentProps }) {
+  const router = useRouter(); // 2. Initialize the router
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   
@@ -45,7 +47,6 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
-    // 2. Trigger loading toast
     const toastId = toast.loading("Analyzing document with Gemini AI...");
     
     try {
@@ -53,11 +54,11 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
       if (result.success && result.data) {
         setAnalysis(result.data);
         await saveDocumentAnalysis(doc.id, result.data);
-        // 3. Update to success toast
         toast.success("Analysis complete! Data saved.", { id: toastId });
+        
+        router.refresh(); // 3. Tell Next.js to refresh the page data!
       }
     } catch (err) {
-      // 4. Update to error toast
       toast.error("Failed to analyze document. Please try again.", { id: toastId });
     } finally {
       setIsAnalyzing(false);
@@ -70,6 +71,8 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
     try {
       await deleteDocument(doc.id);
       toast.success("Document deleted successfully", { id: toastId });
+      
+      router.refresh(); // 3. Tell Next.js to refresh the page data!
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete document", { id: toastId });
@@ -77,6 +80,7 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
     }
   };
   
+  // ... the entire return (UI) section stays exactly the same ...
   return (
     <Card className="overflow-hidden hover:shadow-md transition-shadow dark:border-zinc-800">
       <CardContent className="p-4 flex flex-col gap-4">
