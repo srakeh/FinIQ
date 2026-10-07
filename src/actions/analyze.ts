@@ -30,7 +30,7 @@ export async function extractTextFromDocument(fileUrl: string) {
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
     
     // Construct the direct REST API URL using the latest available model
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
     
     // Extract the body payload to make the retry loop cleaner
     const requestBody = {

@@ -3,9 +3,9 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { UploadCloud, Loader2, FileText } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { saveDocumentRecord } from "@/actions/document";
+import { uploadDocument } from "@/actions/upload";
 
 import {
   Dialog,
@@ -26,23 +26,13 @@ export function DocumentUploadButton() {
   const processFile = async (file: File) => {
     setIsUploading(true);
     try {
-      const fileExt = file.name.split('.').pop() || "unknown";
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      // 1. Upload via authenticated server action (bypasses RLS)
+      const formData = new FormData();
+      formData.append("file", file);
+      const { publicUrl, fileExt } = await uploadDocument(formData);
 
-      // 1. Upload to Supabase Data Lake
-      const { error } = await supabase.storage
-        .from("documents")
-        .upload(fileName, file);
-
-      if (error) throw error;
-
-      // 2. Get the public download URL from Supabase
-      const { data: publicUrlData } = supabase.storage
-        .from("documents")
-        .getPublicUrl(fileName);
-
-      // 3. Save the record to your PostgreSQL Database
-      await saveDocumentRecord(file.name, publicUrlData.publicUrl, fileExt);
+      // 2. Save the record to your PostgreSQL Database
+      await saveDocumentRecord(file.name, publicUrl, fileExt);
 
       alert("File successfully ingested into the data lake!");
       setIsOpen(false);
@@ -117,7 +107,7 @@ export function DocumentUploadButton() {
               ref={fileInputRef}
               className="hidden"
               onChange={handleFileSelect}
-              accept=".pdf,.csv,.xlsx,.docx,.txt"
+              accept=".pdf,.csv,.txt,.png,.jpg,.jpeg,.webp"
             />
             
             <Button 
@@ -138,7 +128,7 @@ export function DocumentUploadButton() {
               {isDragging ? "Drop file to upload" : "Or drag and drop your file here"}
             </p>
             <p className="text-xs text-zinc-500 mt-1">
-              Supported formats: PDF, CSV, XLSX, DOCX, TXT
+              Supported formats: PDF, CSV, TXT, PNG, JPG, WebP
             </p>
           </div>
         </DialogContent>
