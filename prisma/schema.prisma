@@ -23,11 +23,12 @@ model User {
 
 model Document {
   id        String   @id @default(uuid())
-  userId    String   // This will securely store the Clerk ID
+  userId    String   // Clerk ID for quick lookups
   title     String
   fileUrl   String
   fileType  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   documentType   String?
   accountHolder  String?
