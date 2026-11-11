@@ -4,7 +4,8 @@ import prisma from "@/lib/prisma";
 import { DocumentCard } from "@/components/features/document-card";
 import { ExportButton } from "@/components/features/export-button";
 import { FinancialChart } from "@/components/features/financial-chart";
-import { IndianRupee, TrendingDown, Wallet } from "lucide-react"; 
+import { DocumentUploadButton } from "@/components/document-upload-button";
+import { IndianRupee, TrendingDown, Wallet, AlertCircle } from "lucide-react"; 
 
 function parseCurrency(val: string | null) {
   if (!val || val === "N/A") return 0;
@@ -16,10 +17,18 @@ export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 
-  const documents: any[] = await prisma.document.findMany({
-    where: { userId: userId },
-    orderBy: { createdAt: "desc" },
-  });
+  let documents: any[] = [];
+  let dbError: string | null = null;
+
+  try {
+    documents = await prisma.document.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error: any) {
+    console.error("Dashboard database query error:", error);
+    dbError = "Unable to connect to the database right now. Please check your database settings or try again shortly.";
+  }
 
   const totalIncome = documents.reduce((acc: number, doc: any) => acc + parseCurrency(doc.netIncome), 0);
   const totalTaxes = documents.reduce((acc: number, doc: any) => acc + parseCurrency(doc.taxDeductions), 0);
@@ -30,13 +39,24 @@ export default async function DashboardPage() {
 
   return (
     <main className="max-w-6xl mx-auto p-6 space-y-8">
-      {/* Header with Export Button */}
+      {/* DB Connection Notice if applicable */}
+      {dbError && (
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
+          <AlertCircle className="h-5 w-5 shrink-0" />
+          <p>{dbError}</p>
+        </div>
+      )}
+
+      {/* Header with Upload and Export Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Financial Dashboard</h1>
           <p className="text-zinc-500 mt-1">Manage your financial documents and track AI-extracted insights.</p>
         </div>
-        <ExportButton documents={documents} />
+        <div className="flex items-center gap-3">
+          <DocumentUploadButton />
+          <ExportButton documents={documents} />
+        </div>
       </div>
 
       {/* Summary Widgets */}
@@ -68,8 +88,11 @@ export default async function DashboardPage() {
 
       {/* Chart and Documents Grid */}
       {documents.length === 0 ? (
-        <div className="text-center p-12 border-2 border-dashed border-zinc-200 rounded-lg dark:border-zinc-800">
-          <p className="text-zinc-500">No documents uploaded yet.</p>
+        <div className="text-center p-12 border-2 border-dashed border-zinc-200 rounded-lg dark:border-zinc-800 space-y-4">
+          <p className="text-zinc-500">No documents uploaded yet. Start by uploading a financial document to analyze with AI!</p>
+          <div className="inline-block">
+            <DocumentUploadButton />
+          </div>
         </div>
       ) : (
         <>

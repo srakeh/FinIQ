@@ -7,7 +7,7 @@ import { DocumentUploadButton } from "@/components/document-upload-button";
 export default async function DocumentsPage() {
   // Secure the route
   const { userId } = await auth();
-  if (!userId) redirect("/");
+  if (!userId) redirect("/sign-in");
 
   return (
     <div className="p-6 space-y-6 bg-zinc-50 min-h-full dark:bg-zinc-950">

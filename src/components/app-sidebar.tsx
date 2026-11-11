@@ -1,7 +1,9 @@
 import { Home, Building2, FileText, Settings } from "lucide-react";
+import { UserButton } from "@clerk/nextjs";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -24,23 +26,30 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>FinIQ Platform</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-emerald-500 font-bold tracking-wide">
+            FinIQ Platform
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                <Link href={item.url} className="w-full block">
-                  <SidebarMenuButton>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
+                  <Link href={item.url} className="w-full block">
+                    <SidebarMenuButton>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-4 border-t border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-center gap-3">
+          <UserButton showName />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }

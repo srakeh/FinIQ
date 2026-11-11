@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -7,22 +7,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 
 export default async function StartupsPage() {
-  // 1. Secure the route
   const { userId } = await auth();
-  if (!userId) redirect("/");
+  if (!userId) redirect("/sign-in");
 
-  // 2. Get the internal Database ID for this specific user
-  const dbUser = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
+  const clerkUser = await currentUser();
+  let startups: any[] = [];
 
-  if (!dbUser) redirect("/");
+  try {
+    let dbUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
 
-  // 3. Fetch all startups that belong ONLY to this user
-  const startups = await prisma.startup.findMany({
-    where: { userId: dbUser.id },
-    orderBy: { createdAt: 'desc' }
-  });
+    if (!dbUser && clerkUser) {
+      dbUser = await prisma.user.create({
+        data: {
+          clerkId: userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || `${userId}@user.finiq`,
+          firstName: clerkUser.firstName || "",
+          lastName: clerkUser.lastName || "",
+        },
+      });
+    }
+
+    if (dbUser) {
+      startups = await prisma.startup.findMany({
+        where: { userId: dbUser.id },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching startups:", error);
+  }
 
   return (
     <div className="p-6 space-y-6 bg-zinc-50 min-h-full dark:bg-zinc-950">
