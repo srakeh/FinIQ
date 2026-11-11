@@ -29,17 +29,27 @@ export function DocumentUploadButton() {
       // 1. Upload via authenticated server action (bypasses RLS)
       const formData = new FormData();
       formData.append("file", file);
-      const { publicUrl, fileExt } = await uploadDocument(formData);
+      const uploadRes = await uploadDocument(formData);
+
+      if (uploadRes.error) {
+        alert(`Upload error: ${uploadRes.error}`);
+        return;
+      }
 
       // 2. Save the record to your PostgreSQL Database
-      await saveDocumentRecord(file.name, publicUrl, fileExt);
+      const saveRes = await saveDocumentRecord(file.name, uploadRes.publicUrl!, uploadRes.fileExt!);
+
+      if (saveRes.error) {
+        alert(`Database error: ${saveRes.error}`);
+        return;
+      }
 
       alert("File successfully ingested into the data lake!");
       setIsOpen(false);
       router.refresh(); 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Upload failed. Check the console.");
+      alert(`Upload failed: ${error?.message || "Please check your network connection."}`);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

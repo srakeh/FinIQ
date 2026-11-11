@@ -5,12 +5,12 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase"; 
 
-// 1. The Save function (Unchanged)
+// 1. The Save function
 export async function saveDocumentRecord(title: string, fileUrl: string, fileType: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   try {
+    const { userId } = await auth();
+    if (!userId) return { error: "Unauthorized. Please sign in." };
+
     const newDoc = await prisma.document.create({
       data: {
         title: title,
@@ -22,9 +22,9 @@ export async function saveDocumentRecord(title: string, fileUrl: string, fileTyp
     
     revalidatePath("/dashboard");
     return { success: true, document: newDoc };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Save Document Error:", error);
-    throw new Error("Failed to save document to database");
+    return { error: error?.message || "Failed to save document to database" };
   }
 }
 
