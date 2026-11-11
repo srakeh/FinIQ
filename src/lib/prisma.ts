@@ -13,7 +13,16 @@ const prismaClientSingleton = () => {
   // Sanitize: strip surrounding quotes if accidentally pasted in Vercel UI
   connectionString = connectionString.trim().replace(/^["']|["']$/g, '');
 
-  // Ensure SSL is configured for Supabase pooler
+  // Strip sslmode from the URL so pg-connection-string does not overwrite rejectUnauthorized: false with {}
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete('sslmode');
+    connectionString = url.toString();
+  } catch (e) {
+    // If connectionString is not a valid URL for URL parser, proceed as-is
+  }
+
+  // Ensure SSL is configured for Supabase pooler with self-signed cert support
   const pool = new Pool({
     connectionString,
     ssl: { rejectUnauthorized: false },
