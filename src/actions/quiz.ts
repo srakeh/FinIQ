@@ -3,6 +3,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { QuizSubmitSchema } from "@/lib/validations";
+import { rateLimit, RateLimits } from "@/lib/rate-limit";
 
 export interface QuizQuestion {
   id: number;
@@ -317,6 +319,22 @@ export async function generateQuizQuestions(topic: string): Promise<{
   const normalizedTopic =
     CURATED_QUIZ_BANK[topic] ? topic : "Angel Investing 101";
 
+  // Rate limiting protection for dynamic generation
+  const { userId } = await auth();
+  if (userId) {
+    const limitCheck = rateLimit(userId, RateLimits.QUIZ_GENERATION);
+    if (!limitCheck.success) {
+      return {
+        success: true,
+        questions:
+          CURATED_QUIZ_BANK[normalizedTopic] ||
+          CURATED_QUIZ_BANK["Angel Investing 101"],
+        topic: normalizedTopic,
+        isAiGenerated: false,
+      };
+    }
+  }
+
   // Try generating fresh questions with Gemini
   const candidateModels = [
     "gemini-3.1-flash-lite",
@@ -427,15 +445,25 @@ export async function recordQuizAttempt(data: {
   const { userId } = await auth();
   if (!userId) return { success: false, error: "Unauthorized" };
 
+  const validation = QuizSubmitSchema.safeParse(data);
+  if (!validation.success) {
+    return {
+      success: false,
+      error: validation.error.issues[0]?.message || "Invalid quiz submission data",
+    };
+  }
+
+  const { topic, score, totalScore } = validation.data;
+
   try {
     const dbUser = await ensureDbUser(userId);
 
     const attempt = await prisma.quizAttempt.create({
       data: {
         userId: dbUser.id,
-        topic: data.topic,
-        score: data.score,
-        totalScore: data.totalScore,
+        topic,
+        score,
+        totalScore,
       },
     });
 

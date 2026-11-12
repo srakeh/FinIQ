@@ -2,6 +2,8 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { SendChatMessageSchema } from "@/lib/validations";
+import { rateLimit, RateLimits } from "@/lib/rate-limit";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -15,9 +17,29 @@ export async function sendChatMessage(
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  if (!userMessage || userMessage.trim().length === 0) {
-    throw new Error("Message cannot be empty");
+  // 1. Rate limiting check
+  const limitCheck = rateLimit(userId, RateLimits.AI_CHAT);
+  if (!limitCheck.success) {
+    throw new Error(
+      `FinIQ Advisor is receiving too many requests. Please wait ${Math.ceil(
+        limitCheck.resetMs / 1000
+      )}s before asking another question.`
+    );
   }
+
+  // 2. Input validation via Zod
+  const validation = SendChatMessageSchema.safeParse({
+    message: userMessage,
+    conversationHistory,
+  });
+
+  if (!validation.success) {
+    const errorMsg = validation.error.issues.map((i) => i.message).join(", ");
+    throw new Error(`Validation failed: ${errorMsg}`);
+  }
+
+  const { message: cleanMessage, conversationHistory: cleanHistory } =
+    validation.data;
 
   // 1. Fetch the user's analyzed documents to ground AI responses
   let financialContext = "";
@@ -103,7 +125,7 @@ ${financialContext || "The user has not uploaded or analyzed any financial docum
 
   // 3. Construct Gemini API request with conversation history
   // Keep last 10 messages for context window management
-  const recentHistory = conversationHistory.slice(-10);
+  const recentHistory = cleanHistory.slice(-10);
 
   const contents = [
     // System instruction as first user message (Gemini API pattern)
@@ -115,7 +137,7 @@ ${financialContext || "The user has not uploaded or analyzed any financial docum
       parts: [{ text: msg.content }],
     })),
     // Current user message
-    { role: "user", parts: [{ text: userMessage }] },
+    { role: "user", parts: [{ text: cleanMessage }] },
   ];
 
   const requestBody = {

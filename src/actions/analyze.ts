@@ -1,10 +1,20 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+import { rateLimit, RateLimits } from "@/lib/rate-limit";
 
 export async function extractTextFromDocument(fileUrl: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
+  const limitCheck = rateLimit(userId, RateLimits.DOCUMENT_ANALYZE);
+  if (!limitCheck.success) {
+    throw new Error(
+      `Analysis limit reached. Please wait ${Math.ceil(
+        limitCheck.resetMs / 1000
+      )}s before submitting another document.`
+    );
+  }
 
   // Dynamically map file extensions to Gemini-supported MIME types
   const extension = fileUrl.toLowerCase().split('.').pop()?.split('?')[0];

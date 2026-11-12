@@ -3,6 +3,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { InvestorProfileSchema } from "@/lib/validations";
 
 // Ensure the internal User record exists (Clerk → Prisma bridge)
 export async function ensureDbUser(clerkId: string) {
@@ -64,6 +65,23 @@ export async function saveInvestmentProfile(formData: FormData) {
 
   if (interests.length === 0) {
     return { error: "Please select at least one sector interest." };
+  }
+
+  const profileValidation = InvestorProfileSchema.safeParse({
+    riskTolerance,
+    preferredStage,
+    checkSize,
+    targetMarket,
+    interests,
+    bio,
+  });
+
+  if (!profileValidation.success) {
+    return {
+      error:
+        profileValidation.error.issues[0]?.message ||
+        "Invalid profile configuration",
+    };
   }
 
   try {

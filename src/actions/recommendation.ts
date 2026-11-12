@@ -2,6 +2,7 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { rateLimit, RateLimits } from "@/lib/rate-limit";
 
 interface Recommendation {
   companyName: string;
@@ -21,6 +22,16 @@ export async function generateRecommendations(): Promise<{
 }> {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+
+  const limitCheck = rateLimit(userId, RateLimits.RECOMMENDATIONS);
+  if (!limitCheck.success) {
+    return {
+      success: false,
+      error: `Recommendation generation rate limit exceeded. Please wait ${Math.ceil(
+        limitCheck.resetMs / 1000
+      )}s before regenerating matches.`,
+    };
+  }
 
   // 1. Get user's internal DB record
   let dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });

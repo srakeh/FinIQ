@@ -4,12 +4,22 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase"; 
+import { DocumentRecordSchema } from "@/lib/validations";
 
 // 1. The Save function
 export async function saveDocumentRecord(title: string, fileUrl: string, fileType: string) {
   try {
     const { userId } = await auth();
     if (!userId) return { error: "Unauthorized. Please sign in." };
+
+    const validation = DocumentRecordSchema.safeParse({
+      title,
+      fileUrl,
+    });
+
+    if (!validation.success) {
+      return { error: validation.error.issues[0]?.message || "Invalid document data" };
+    }
 
     const newDoc = await prisma.document.create({
       data: {
