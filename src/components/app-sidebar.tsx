@@ -21,7 +21,7 @@ const items = [
   { title: "Quizzes", url: "/dashboard/quiz", icon: GraduationCap },
   { title: "Startups", url: "/dashboard/startups", icon: Building2 },
   { title: "Documents", url: "/dashboard/documents", icon: FileText },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  { title: "Profile & Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
 export function AppSidebar() {

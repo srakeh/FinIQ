@@ -18,6 +18,20 @@ const STAGE_OPTIONS = [
   "Growth Stage",
 ] as const;
 
+const CHECK_SIZE_OPTIONS = [
+  "<$25K (Micro Angel)",
+  "$25K - $50K (Standard)",
+  "$50K - $100K (Syndicate)",
+  "$100K+ (Super Angel)",
+] as const;
+
+const MARKET_OPTIONS = [
+  "India & South Asia",
+  "United States & Global",
+  "Southeast Asia (SEA)",
+  "Cross-Border Indo-US",
+] as const;
+
 const INTEREST_OPTIONS = [
   "Fintech",
   "HealthTech",
@@ -38,6 +52,9 @@ interface Props {
     riskTolerance: string;
     preferredStage: string;
     interests: string[];
+    checkSize?: string | null;
+    targetMarket?: string | null;
+    bio?: string | null;
   } | null;
 }
 
@@ -45,13 +62,22 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [risk, setRisk] = useState(
-    existingProfile?.riskTolerance || ""
+    existingProfile?.riskTolerance || "Moderate"
   );
   const [stage, setStage] = useState(
-    existingProfile?.preferredStage || ""
+    existingProfile?.preferredStage || "Seed"
+  );
+  const [checkSize, setCheckSize] = useState(
+    existingProfile?.checkSize || "$25K - $50K (Standard)"
+  );
+  const [targetMarket, setTargetMarket] = useState(
+    existingProfile?.targetMarket || "India & South Asia"
+  );
+  const [bio, setBio] = useState(
+    existingProfile?.bio || ""
   );
   const [interests, setInterests] = useState<string[]>(
-    existingProfile?.interests || []
+    existingProfile?.interests || ["Fintech", "AI / ML"]
   );
 
   const toggleInterest = (item: string) => {
@@ -74,13 +100,16 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
     formData.set("riskTolerance", risk);
     formData.set("preferredStage", stage);
     formData.set("interests", interests.join(","));
+    formData.set("checkSize", checkSize);
+    formData.set("targetMarket", targetMarket);
+    formData.set("bio", bio);
 
     try {
       const result = await saveInvestmentProfile(formData);
       if (result.error) {
         toast.error(result.error);
       } else {
-        toast.success("Investment profile saved!");
+        toast.success("Investment preferences updated successfully!");
         router.refresh();
       }
     } catch (err: any) {
@@ -94,7 +123,9 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Risk Tolerance */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium">Risk Tolerance</Label>
+        <Label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Risk Tolerance
+        </Label>
         <div className="grid grid-cols-3 gap-2">
           {RISK_OPTIONS.map((option) => (
             <button
@@ -104,7 +135,7 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
               className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                 risk === option
                   ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300"
+                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300 dark:hover:border-emerald-700"
               }`}
             >
               {option}
@@ -115,7 +146,9 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
 
       {/* Preferred Stage */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium">Preferred Investment Stage</Label>
+        <Label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Preferred Investment Stage
+        </Label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {STAGE_OPTIONS.map((option) => (
             <button
@@ -125,7 +158,53 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
               className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                 stage === option
                   ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300"
+                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300 dark:hover:border-emerald-700"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Ticket Size Bracket */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Typical Ticket / Check Size
+        </Label>
+        <div className="grid grid-cols-2 gap-2">
+          {CHECK_SIZE_OPTIONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setCheckSize(option)}
+              className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all text-left ${
+                checkSize === option
+                  ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300 dark:hover:border-emerald-700"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Target Geography */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Geographic Focus
+        </Label>
+        <div className="grid grid-cols-2 gap-2">
+          {MARKET_OPTIONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setTargetMarket(option)}
+              className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-all text-left ${
+                targetMarket === option
+                  ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-emerald-300 dark:hover:border-emerald-700"
               }`}
             >
               {option}
@@ -136,7 +215,7 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
 
       {/* Sector Interests */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium">
+        <Label className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
           Sector Interests{" "}
           <span className="text-zinc-400 font-normal">(select all that apply)</span>
         </Label>
@@ -149,7 +228,7 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                 interests.includes(option)
                   ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700"
-                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-emerald-300"
+                  : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-emerald-300 dark:hover:border-emerald-700"
               }`}
             >
               {interests.includes(option) && (
@@ -159,6 +238,22 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Investor Thesis / Bio */}
+      <div className="space-y-2">
+        <Label htmlFor="bio" className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Investment Thesis & Syndicate Bio{" "}
+          <span className="text-zinc-400 font-normal">(optional)</span>
+        </Label>
+        <textarea
+          id="bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          rows={3}
+          placeholder="e.g. Backing technical founders in AI Infrastructure and B2B SaaS in India and US corridors with high-velocity product cycles."
+          className="w-full px-3 py-2 text-sm rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+        />
       </div>
 
       <Button
@@ -171,7 +266,7 @@ export function InvestmentProfileForm({ existingProfile }: Props) {
         ) : (
           <Save className="mr-2 h-4 w-4" />
         )}
-        {existingProfile ? "Update Profile" : "Save Profile"}
+        {existingProfile ? "Update Preferences" : "Save Preferences"}
       </Button>
     </form>
   );
