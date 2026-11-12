@@ -58,8 +58,9 @@ export function DocumentCard({ doc }: { doc: DocumentProps }) {
         
         router.refresh(); // 3. Tell Next.js to refresh the page data!
       }
-    } catch (err) {
-      toast.error("Failed to analyze document. Please try again.", { id: toastId });
+    } catch (err: any) {
+      console.error("Document analysis error:", err);
+      toast.error(err?.message || "Failed to analyze document. Please try again.", { id: toastId });
     } finally {
       setIsAnalyzing(false);
     }

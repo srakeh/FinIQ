@@ -13,6 +13,8 @@ function parseCurrency(val: string | null) {
   return isNaN(num) ? 0 : num;
 }
 
+export const maxDuration = 60;
+
 export default async function DashboardPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");

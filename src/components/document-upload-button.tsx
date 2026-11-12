@@ -6,6 +6,7 @@ import { UploadCloud, Loader2, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { saveDocumentRecord } from "@/actions/document";
 import { uploadDocument } from "@/actions/upload";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -25,6 +26,7 @@ export function DocumentUploadButton() {
   // The actual upload logic (extracted so both click and drop can use it)
   const processFile = async (file: File) => {
     setIsUploading(true);
+    const toastId = toast.loading(`Uploading ${file.name}...`);
     try {
       // 1. Upload via authenticated server action (bypasses RLS)
       const formData = new FormData();
@@ -32,7 +34,7 @@ export function DocumentUploadButton() {
       const uploadRes = await uploadDocument(formData);
 
       if (uploadRes.error) {
-        alert(`Upload error: ${uploadRes.error}`);
+        toast.error(`Upload error: ${uploadRes.error}`, { id: toastId });
         return;
       }
 
@@ -40,16 +42,16 @@ export function DocumentUploadButton() {
       const saveRes = await saveDocumentRecord(file.name, uploadRes.publicUrl!, uploadRes.fileExt!);
 
       if (saveRes.error) {
-        alert(`Database error: ${saveRes.error}`);
+        toast.error(`Database error: ${saveRes.error}`, { id: toastId });
         return;
       }
 
-      alert("File successfully ingested into the data lake!");
+      toast.success("File successfully ingested into your vault!", { id: toastId });
       setIsOpen(false);
       router.refresh(); 
     } catch (error: any) {
       console.error(error);
-      alert(`Upload failed: ${error?.message || "Please check your network connection."}`);
+      toast.error(`Upload failed: ${error?.message || "Please check your network connection."}`, { id: toastId });
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';

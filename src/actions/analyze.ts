@@ -29,8 +29,14 @@ export async function extractTextFromDocument(fileUrl: string) {
     const arrayBuffer = await response.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
     
-    // Primary model: gemini-3.5-flash (with automatic fallback on 404/503)
-    const candidateModels = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest"];
+    // Primary model: gemini-3.1-flash-lite (fastest, under 1s, verified 200 OK)
+    // with automatic fallback cascade on temporary spikes
+    const candidateModels = [
+      "gemini-3.1-flash-lite",
+      "gemini-3.1-flash-lite-preview",
+      "gemini-3.5-flash-lite",
+      "gemini-3.5-flash"
+    ];
     
     // Extract the body payload to make the retry loop cleaner
     const requestBody = {
@@ -57,62 +63,66 @@ export async function extractTextFromDocument(fileUrl: string) {
 
     let geminiResponse: Response | null = null;
     let successfulModel = "";
+    let lastErrorDetails = "";
 
-    // Loop through candidate models if one encounters a permanent error or heavy traffic
+    // Loop through candidate models if one encounters a temporary error or heavy traffic
     for (const modelName of candidateModels) {
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-      const maxRetries = 2;
-      let attempt = 0;
+      
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-      while (attempt < maxRetries) {
-        try {
-          const res = await fetch(geminiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody),
-          });
+        const res = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal
+        });
 
-          if (res.ok) {
-            geminiResponse = res;
-            successfulModel = modelName;
-            break;
-          }
+        clearTimeout(timeoutId);
 
-          // If 503, wait and retry
-          if (res.status === 503) {
-            attempt++;
-            console.warn(`Gemini (${modelName}) 503 busy. Retry ${attempt}/${maxRetries}...`);
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            continue;
-          }
-
-          // If 404, break to try the next model
-          break;
-        } catch (fetchErr) {
-          console.warn(`Fetch error with ${modelName}:`, fetchErr);
+        if (res.ok) {
+          geminiResponse = res;
+          successfulModel = modelName;
+          console.log(`Gemini analysis succeeded using model: ${modelName}`);
           break;
         }
-      }
 
-      if (geminiResponse && geminiResponse.ok) {
-        break;
+        const errText = await res.text();
+        lastErrorDetails = `Model ${modelName} returned HTTP ${res.status}: ${errText.slice(0, 120)}`;
+        console.warn(`Gemini (${modelName}) returned ${res.status}. Falling back to next model...`);
+      } catch (fetchErr: any) {
+        lastErrorDetails = `Model ${modelName} fetch error: ${fetchErr?.message || fetchErr}`;
+        console.warn(`Fetch error with ${modelName}:`, fetchErr?.message);
       }
     }
 
-    // Check if we exhausted retries or hit a different API error
+    // Check if we exhausted candidate models
     if (!geminiResponse || !geminiResponse.ok) {
-      const errorText = await geminiResponse?.text();
-      console.error("Gemini API Error:", errorText);
-      throw new Error("Failed to communicate with Gemini API");
+      console.error("Gemini API Error details:", lastErrorDetails);
+      throw new Error("Failed to communicate with Gemini API. " + lastErrorDetails);
     }
 
     const data = await geminiResponse.json();
-    const aiResponseText = data.candidates[0].content.parts[0].text;
+    const aiResponseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    const structuredData = JSON.parse(aiResponseText);
-    console.log("AI Analysis Complete:", structuredData);
+    if (!aiResponseText) {
+      throw new Error("No analysis content returned from AI model");
+    }
 
-    return { success: true, data: structuredData };
+    // Strip markdown code fences if present to guarantee valid JSON parsing
+    let cleanJson = aiResponseText.trim();
+    if (cleanJson.startsWith("```json")) {
+      cleanJson = cleanJson.replace(/^```json\s*/i, "").replace(/```\s*$/, "");
+    } else if (cleanJson.startsWith("```")) {
+      cleanJson = cleanJson.replace(/^```\s*/, "").replace(/```\s*$/, "");
+    }
+
+    const structuredData = JSON.parse(cleanJson.trim());
+    console.log("AI Analysis Complete via", successfulModel, ":", structuredData);
+
+    return { success: true, model: successfulModel, data: structuredData };
 
   } catch (error) {
     console.error("Analysis Pipeline Error:", error);
