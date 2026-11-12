@@ -1,4 +1,4 @@
-import { Home, Building2, FileText, Settings } from "lucide-react";
+import { Home, Building2, FileText, Settings, BrainCircuit } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import Link from "next/link";
 // Our navigation links
 const items = [
   { title: "Overview", url: "/dashboard", icon: Home },
+  { title: "AI Advisor", url: "/dashboard/chat", icon: BrainCircuit },
   { title: "Startups", url: "/dashboard/startups", icon: Building2 },
   { title: "Documents", url: "/dashboard/documents", icon: FileText },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
