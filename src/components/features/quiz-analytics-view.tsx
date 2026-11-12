@@ -168,7 +168,7 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
       {/* Charts Grid */}
       <div className="grid gap-6 lg:grid-cols-7">
         {/* Score Progression Timeline (Spans 4 columns) */}
-        <Card className="lg:col-span-4 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <Card className="lg:col-span-4 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm min-w-0">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
               Score Progression Over Time
@@ -178,7 +178,7 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[280px] w-full mt-2">
+            <div className="h-[280px] w-full mt-2 min-w-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={data.timeline}
@@ -234,7 +234,7 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
         </Card>
 
         {/* Topic Mastery Bar Chart (Spans 3 columns) */}
-        <Card className="lg:col-span-3 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <Card className="lg:col-span-3 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm min-w-0">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
               Domain Mastery Breakdown
