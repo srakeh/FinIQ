@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
+import { CommandPalette } from "@/components/command-palette";
 import { BrainCircuit, Home } from "lucide-react";
 
 export default function DashboardLayout({
@@ -25,6 +26,9 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {/* Command Palette (Cmd + K) */}
+            <CommandPalette />
+
             {/* Direct Home Button to Main Landing Page */}
             <Link
               href="/"

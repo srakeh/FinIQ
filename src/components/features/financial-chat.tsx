@@ -27,18 +27,30 @@ const QUICK_PROMPTS = [
   "Summarize my financial health from my documents",
 ];
 
-export function FinancialChat() {
+export function FinancialChat({
+  initialPrompt,
+}: {
+  initialPrompt?: string;
+} = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const hasTriggeredInitial = useRef(false);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (initialPrompt && !hasTriggeredInitial.current) {
+      hasTriggeredInitial.current = true;
+      handleSend(initialPrompt);
+    }
+  }, [initialPrompt]);
 
   const handleSend = async (messageText?: string) => {
     const text = (messageText || input).trim();

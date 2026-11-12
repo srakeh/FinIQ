@@ -7,6 +7,7 @@ import {
   Lightbulb,
   GraduationCap,
   Globe,
+  Calculator,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import {
@@ -30,6 +31,7 @@ const items = [
   { title: "Overview", url: "/dashboard", icon: Home },
   { title: "AI Advisor", url: "/dashboard/chat", icon: BrainCircuit },
   { title: "Recommendations", url: "/dashboard/recommendations", icon: Lightbulb },
+  { title: "Cap Table Simulator", url: "/dashboard/calculator", icon: Calculator },
   { title: "Quizzes", url: "/dashboard/quiz", icon: GraduationCap },
   { title: "Startups", url: "/dashboard/startups", icon: Building2 },
   { title: "Documents", url: "/dashboard/documents", icon: FileText },
