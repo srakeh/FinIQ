@@ -1,4 +1,4 @@
-import { Home, Building2, FileText, Settings, BrainCircuit, Lightbulb } from "lucide-react";
+import { Home, Building2, FileText, Settings, BrainCircuit, Lightbulb, GraduationCap } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import {
   Sidebar,
@@ -18,6 +18,7 @@ const items = [
   { title: "Overview", url: "/dashboard", icon: Home },
   { title: "AI Advisor", url: "/dashboard/chat", icon: BrainCircuit },
   { title: "Recommendations", url: "/dashboard/recommendations", icon: Lightbulb },
+  { title: "Quizzes", url: "/dashboard/quiz", icon: GraduationCap },
   { title: "Startups", url: "/dashboard/startups", icon: Building2 },
   { title: "Documents", url: "/dashboard/documents", icon: FileText },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
