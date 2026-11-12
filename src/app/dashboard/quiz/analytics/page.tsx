@@ -1,12 +1,21 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import nextDynamic from "next/dynamic";
 import { getQuizAnalytics } from "@/actions/quiz";
-import { QuizAnalyticsView } from "@/components/features/quiz-analytics-view";
+import QuizAnalyticsLoading from "./loading";
 import { BarChart3, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
+
+// Dynamically import heavy Recharts client component to optimize initial load
+const QuizAnalyticsView = nextDynamic(
+  () => import("@/components/features/quiz-analytics-view").then((mod) => mod.QuizAnalyticsView),
+  {
+    loading: () => <QuizAnalyticsLoading />,
+  }
+);
 
 export default async function QuizAnalyticsPage() {
   const { userId } = await auth();

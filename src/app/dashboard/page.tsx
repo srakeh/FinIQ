@@ -1,11 +1,21 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import dynamic from "next/dynamic";
 import prisma from "@/lib/prisma";
 import { DocumentCard } from "@/components/features/document-card";
 import { ExportButton } from "@/components/features/export-button";
-import { FinancialChart } from "@/components/features/financial-chart";
 import { DocumentUploadButton } from "@/components/document-upload-button";
 import { IndianRupee, TrendingDown, Wallet, AlertCircle } from "lucide-react"; 
+
+// Dynamically import heavy Recharts visualization to reduce initial JS bundle size
+const FinancialChart = dynamic(
+  () => import("@/components/features/financial-chart").then((mod) => mod.FinancialChart),
+  {
+    loading: () => (
+      <div className="h-[300px] w-full rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-pulse mb-8" />
+    ),
+  }
+); 
 
 function parseCurrency(val: string | null) {
   if (!val || val === "N/A") return 0;
