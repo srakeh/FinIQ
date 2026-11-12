@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { ArrowRight, Bot, UploadCloud, BarChart3, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -12,14 +13,7 @@ export default async function HomePage() {
       {/* Navigation Bar */}
       <header className="border-b border-border/60 bg-card/60 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white font-extrabold text-base shadow-[0_0_15px_rgba(255,128,0,0.4)]">
-              F
-            </div>
-            <span className="font-extrabold text-xl tracking-tight text-foreground">
-              FinIQ
-            </span>
-          </div>
+          <Logo href="/" size="md" />
 
           <div className="flex items-center gap-3">
             <ThemeToggle />

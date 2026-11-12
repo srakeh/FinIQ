@@ -157,9 +157,12 @@ export async function getInvestorSummary(): Promise<InvestorSummaryData | null> 
   if (!userId) return null;
 
   try {
+    const clerkUserPromise = currentUser().catch(() => null);
+    const dbUserPromise = ensureDbUser(userId);
+
     const [clerkUser, dbUser] = await Promise.all([
-      currentUser(),
-      ensureDbUser(userId),
+      clerkUserPromise,
+      dbUserPromise,
     ]);
 
     const [profile, quizAttempts, docCount, startupCount] = await Promise.all([

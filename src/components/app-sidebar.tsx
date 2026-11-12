@@ -1,9 +1,19 @@
-import { Home, Building2, FileText, Settings, BrainCircuit, Lightbulb, GraduationCap } from "lucide-react";
+import {
+  Home,
+  Building2,
+  FileText,
+  Settings,
+  BrainCircuit,
+  Lightbulb,
+  GraduationCap,
+  Globe,
+} from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarHeader,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,9 +22,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 import Link from "next/link";
 
-// Our navigation links
+// Our core dashboard navigation links
 const items = [
   { title: "Overview", url: "/dashboard", icon: Home },
   { title: "AI Advisor", url: "/dashboard/chat", icon: BrainCircuit },
@@ -28,10 +39,14 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar className="border-r border-sidebar-border bg-sidebar transition-colors">
+      <SidebarHeader className="p-4 border-b border-sidebar-border/60">
+        <Logo href="/" size="sm" />
+      </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[11px] px-2 py-3">
-            FinIQ Platform
+          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[11px] px-2 py-2">
+            Workstation
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -48,7 +63,24 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Public Portal Return Link */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <Link href="/" className="w-full block">
+                  <SidebarMenuButton className="text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-colors">
+                    <Globe className="h-4 w-4 text-orange-500" />
+                    <span className="font-medium text-xs">Public Homepage</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter className="p-3 border-t border-sidebar-border flex flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-2 overflow-hidden">
           <UserButton showName />
