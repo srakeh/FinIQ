@@ -12,6 +12,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { sendChatMessage } from "@/actions/chat";
+import { FormattedMessage } from "@/components/features/formatted-message";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -151,9 +152,13 @@ export function FinancialChat() {
               <p className="text-xs font-medium text-zinc-400 mb-1">
                 {msg.role === "assistant" ? "FinIQ Advisor" : "You"}
               </p>
-              <div className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed break-words">
-                {msg.content}
-              </div>
+              {msg.role === "assistant" ? (
+                <FormattedMessage content={msg.content} />
+              ) : (
+                <div className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed break-words">
+                  {msg.content}
+                </div>
+              )}
             </div>
           </div>
         ))}
