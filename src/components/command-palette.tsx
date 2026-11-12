@@ -21,6 +21,7 @@ import {
   ArrowRight,
   Calculator,
   PieChart,
+  Palette,
 } from "lucide-react";
 import {
   Dialog,
@@ -151,6 +152,15 @@ export function CommandPalette({
         subtitle: "Investor check size, sector interests, and data export",
         icon: Settings,
         category: "Navigation",
+        action: () => navigateTo("/dashboard/settings"),
+      },
+      {
+        id: "nav-logos",
+        title: "Brand Logo Studio",
+        subtitle: "Preview and select from 10 bespoke vector emblems",
+        icon: Palette,
+        category: "Navigation",
+        badge: "10 Designs",
         action: () => navigateTo("/dashboard/settings"),
       },
       {

@@ -29,13 +29,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { UserButton } from "@clerk/nextjs";
+import { LogoStudio } from "@/components/features/logo-studio";
 
 interface Props {
   summary: InvestorSummaryData;
 }
 
 export function UserProfileView({ summary }: Props) {
-  const [activeTab, setActiveTab] = useState<"criteria" | "preferences" | "account">("criteria");
+  const [activeTab, setActiveTab] = useState<"criteria" | "preferences" | "account" | "logos">("criteria");
   const [isExporting, setIsExporting] = useState(false);
 
   // Local display preferences
@@ -203,38 +204,49 @@ export function UserProfileView({ summary }: Props) {
       </div>
 
       {/* 3. Navigation Tabs */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800 gap-6">
+      <div className="flex border-b border-zinc-200 dark:border-zinc-800 gap-6 overflow-x-auto scrollbar-hide">
         <button
           onClick={() => setActiveTab("criteria")}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === "criteria"
-              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              ? "border-orange-500 text-orange-600 dark:text-orange-400"
               : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
           }`}
         >
-          <Sliders className="h-4 w-4" /> Investment Thesis & Criteria
+          <Sliders className="h-4 w-4" /> Investment Thesis
         </button>
 
         <button
           onClick={() => setActiveTab("preferences")}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === "preferences"
-              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              ? "border-orange-500 text-orange-600 dark:text-orange-400"
               : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
           }`}
         >
-          <Settings className="h-4 w-4" /> Platform Preferences
+          <Settings className="h-4 w-4" /> Preferences
+        </button>
+
+        <button
+          onClick={() => setActiveTab("logos")}
+          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === "logos"
+              ? "border-orange-500 text-orange-600 dark:text-orange-400"
+              : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+          }`}
+        >
+          <Sparkles className="h-4 w-4 text-orange-500" /> Logo Studio (10 Options)
         </button>
 
         <button
           onClick={() => setActiveTab("account")}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === "account"
-              ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+              ? "border-orange-500 text-orange-600 dark:text-orange-400"
               : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
           }`}
         >
-          <ShieldCheck className="h-4 w-4" /> Account & Data Security
+          <ShieldCheck className="h-4 w-4" /> Account & Security
         </button>
       </div>
 
@@ -490,6 +502,9 @@ export function UserProfileView({ summary }: Props) {
           </Card>
         </div>
       )}
+
+      {/* TAB 4: Brand Logo Studio (10 Options) */}
+      {activeTab === "logos" && <LogoStudio />}
     </div>
   );
 }

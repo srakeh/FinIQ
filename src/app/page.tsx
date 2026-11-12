@@ -84,7 +84,7 @@ export default async function HomePage() {
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl text-foreground">
             Autonomous Intelligence for{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600">
+            <span className="inline-block cursor-pointer papaya-text-glow text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600">
               Venture Syndicates
             </span>
           </h1>
