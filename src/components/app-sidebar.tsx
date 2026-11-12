@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Globe,
   Calculator,
+  PieChart,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import {
@@ -26,15 +27,22 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
 
-// Our core dashboard navigation links
-const items = [
+// Core dashboard navigation items grouped into venture categories
+const primaryItems = [
   { title: "Overview", url: "/dashboard", icon: Home },
   { title: "AI Advisor", url: "/dashboard/chat", icon: BrainCircuit },
-  { title: "Recommendations", url: "/dashboard/recommendations", icon: Lightbulb },
+  { title: "Deal Recommendations", url: "/dashboard/recommendations", icon: Lightbulb },
+];
+
+const ventureItems = [
+  { title: "Startups & Pipeline", url: "/dashboard/startups", icon: Building2 },
+  { title: "Portfolio Allocator", url: "/dashboard/allocator", icon: PieChart },
   { title: "Cap Table Simulator", url: "/dashboard/calculator", icon: Calculator },
-  { title: "Quizzes", url: "/dashboard/quiz", icon: GraduationCap },
-  { title: "Startups", url: "/dashboard/startups", icon: Building2 },
-  { title: "Documents", url: "/dashboard/documents", icon: FileText },
+];
+
+const resourceItems = [
+  { title: "Academy Quizzes", url: "/dashboard/quiz", icon: GraduationCap },
+  { title: "Document Vault", url: "/dashboard/documents", icon: FileText },
   { title: "Profile & Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
@@ -45,17 +53,60 @@ export function AppSidebar() {
         <Logo href="/" size="sm" />
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="space-y-4">
+        {/* Workstation */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[11px] px-2 py-2">
+          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[10px] px-2 py-1">
             Workstation
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {primaryItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <Link href={item.url} className="w-full block">
-                    <SidebarMenuButton className="hover:bg-sidebar-accent hover:text-orange-500 dark:hover:text-orange-400 data-[active=true]:bg-orange-500/10 data-[active=true]:text-orange-500 transition-colors duration-150">
+                    <SidebarMenuButton className="hover:bg-sidebar-accent hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-150">
+                      <item.icon className="h-4 w-4" />
+                      <span className="font-medium text-sm">{item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Venture Capital */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[10px] px-2 py-1">
+            Venture & Deals
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {ventureItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <Link href={item.url} className="w-full block">
+                    <SidebarMenuButton className="hover:bg-sidebar-accent hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-150">
+                      <item.icon className="h-4 w-4" />
+                      <span className="font-medium text-sm">{item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Intelligence & Settings */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-muted-foreground font-bold tracking-wider uppercase text-[10px] px-2 py-1">
+            Intelligence
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {resourceItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <Link href={item.url} className="w-full block">
+                    <SidebarMenuButton className="hover:bg-sidebar-accent hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-150">
                       <item.icon className="h-4 w-4" />
                       <span className="font-medium text-sm">{item.title}</span>
                     </SidebarMenuButton>

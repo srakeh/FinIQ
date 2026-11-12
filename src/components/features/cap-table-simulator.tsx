@@ -36,7 +36,7 @@ import {
 } from "recharts";
 
 export function CapTableSimulator() {
-  const [activeTab, setActiveTab] = useState<"safe" | "runway">("safe");
+  const [activeTab, setActiveTab] = useState<"safe" | "runway" | "clauses">("safe");
 
   // ==========================================
   // SAFE & Dilution Parameters
@@ -59,6 +59,17 @@ export function CapTableSimulator() {
   const [monthlyBurn, setMonthlyBurn] = useState<number>(1200000); // ₹12 Lakhs gross expenses
   const [monthlyRevenue, setMonthlyRevenue] = useState<number>(400000); // ₹4 Lakhs MRR
   const [momGrowthPct, setMomGrowthPct] = useState<number>(10); // 10% MoM revenue growth
+
+  // ==========================================
+  // Term Sheet & Clause Auditor State
+  // ==========================================
+  const [hasPostMoney, setHasPostMoney] = useState(true);
+  const [hasValuationCap, setHasValuationCap] = useState(true);
+  const [hasDiscount, setHasDiscount] = useState(true);
+  const [hasProRata, setHasProRata] = useState(true);
+  const [hasInfoRights, setHasInfoRights] = useState(true);
+  const [hasMFN, setHasMFN] = useState(true);
+  const [comparisonNextVal, setComparisonNextVal] = useState(60000000); // ₹6 Cr next round pre-money
 
   // SAFE Calculations
   const safeCalculations = useMemo(() => {
@@ -238,6 +249,16 @@ export function CapTableSimulator() {
             }`}
           >
             Cash Runway & Default Alive
+          </button>
+          <button
+            onClick={() => setActiveTab("clauses")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTab === "clauses"
+                ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Term Sheet & Clauses
           </button>
         </div>
       </div>
@@ -793,6 +814,381 @@ export function CapTableSimulator() {
                   </ResponsiveContainer>
                 </div>
               </Card>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ==============================================================
+          TAB 3: TERM SHEET & SAFE CLAUSES
+          ============================================================== */}
+      {activeTab === "clauses" && (
+        <div className="space-y-8">
+          {/* Header & Score Banner */}
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-wider mb-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                Carta-Grade Legal Intelligence
+              </div>
+              <h2 className="text-xl font-extrabold text-foreground">
+                SAFE & Term Sheet Clause Auditor
+              </h2>
+              <p className="text-xs text-muted-foreground max-w-xl">
+                Audit early-stage deal terms to protect angel rights. Model the price impact of Valuation Caps, Discounts, and Pro-Rata side letters.
+              </p>
+            </div>
+
+            {/* Overall Protection Score */}
+            {(() => {
+              const score =
+                (hasPostMoney ? 20 : 0) +
+                (hasValuationCap ? 25 : 0) +
+                (hasDiscount ? 15 : 0) +
+                (hasProRata ? 15 : 0) +
+                (hasInfoRights ? 15 : 0) +
+                (hasMFN ? 10 : 0);
+
+              return (
+                <div className="flex items-center gap-4 bg-secondary/50 border border-border p-4 rounded-xl shrink-0">
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground">Angel Protection Score</p>
+                    <p className="text-2xl font-black text-orange-600 dark:text-orange-400 font-mono">
+                      {score}/100
+                    </p>
+                    <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      {score >= 80 ? "Institutional Grade" : score >= 50 ? "Moderate Protection" : "High Risk Terms"}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-500 flex items-center justify-center font-bold">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Interactive Clause Toggle Checklist & Cap vs Discount Inspector */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left: Clause Checklist (6 cols) */}
+            <div className="lg:col-span-6 space-y-4 bg-card border border-border rounded-2xl p-6 shadow-sm">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-orange-500" />
+                Essential Angel Clauses Checklist
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Toggle clauses present in your target startup&apos;s SAFE or Term Sheet:
+              </p>
+
+              <div className="space-y-3 pt-2">
+                {/* 1. Post-Money SAFE */}
+                <div
+                  onClick={() => setHasPostMoney(!hasPostMoney)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasPostMoney
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasPostMoney}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Post-Money SAFE (YC 2018+ Standard)</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+20 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      Locks in your exact ownership percentage at check time. You are not diluted by subsequent SAFEs raised before Series A.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. Valuation Cap */}
+                <div
+                  onClick={() => setHasValuationCap(!hasValuationCap)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasValuationCap
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasValuationCap}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Valuation Cap Ceiling</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+25 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      Guarantees your maximum conversion valuation regardless of how high Series A is priced. Never invest uncapped.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 3. Discount Rate */}
+                <div
+                  onClick={() => setHasDiscount(!hasDiscount)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasDiscount
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasDiscount}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Conversion Discount (15% - 20%)</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+15 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      Protects you in down-rounds or flat rounds where the valuation is lower than the cap.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4. Pro-Rata Rights */}
+                <div
+                  onClick={() => setHasProRata(!hasProRata)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasProRata
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasProRata}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Pro-Rata Rights Side Letter</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+15 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      Legal right to purchase sufficient shares in Series A to maintain your ownership percentage.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 5. Information Rights */}
+                <div
+                  onClick={() => setHasInfoRights(!hasInfoRights)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasInfoRights
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasInfoRights}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Information & Reporting Rights</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+15 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      Requires founders to share quarterly P&L, burn rate, cash runway, and major corporate events.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 6. MFN Clause */}
+                <div
+                  onClick={() => setHasMFN(!hasMFN)}
+                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3 ${
+                    hasMFN
+                      ? "bg-orange-500/[0.06] border-orange-500/40"
+                      : "bg-secondary/30 border-border/70 opacity-60"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={hasMFN}
+                    readOnly
+                    className="mt-1 accent-orange-500 rounded"
+                  />
+                  <div className="flex-1 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Most Favored Nation (MFN) Clause</span>
+                      <span className="text-[10px] text-orange-500 font-mono">+10 pts</span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5 leading-relaxed">
+                      If the startup issues another SAFE with better cap or terms before Series A, your terms automatically upgrade.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Cap vs Discount Live Conversion Inspector (6 cols) */}
+            <div className="lg:col-span-6 space-y-6">
+              {/* Dynamic conversion calculator */}
+              <div className="bg-card border border-border rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="border-b border-border/60 pb-3">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-orange-500" />
+                    Cap vs Discount Conversion Inspector
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    See how your SAFE converts when the startup raises Series A priced equity:
+                  </p>
+                </div>
+
+                {/* Input: Hypothetical Series A valuation */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <label className="font-semibold text-foreground">
+                      Hypothetical Series A Pre-Money Valuation:
+                    </label>
+                    <span className="font-mono font-bold text-orange-600 dark:text-orange-400">
+                      {formatINR(comparisonNextVal)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={20000000}
+                    max={250000000}
+                    step={5000000}
+                    value={comparisonNextVal}
+                    onChange={(e) => setComparisonNextVal(Number(e.target.value))}
+                    className="w-full accent-orange-500 cursor-pointer h-2 bg-secondary rounded-lg"
+                  />
+                </div>
+
+                {/* Conversion Comparison Metrics */}
+                {(() => {
+                  const effectiveCapVal = valuationCap;
+                  const effectiveDiscountVal = comparisonNextVal * (1 - discountRate / 100);
+                  const capWins = effectiveCapVal <= effectiveDiscountVal;
+                  const winningValuation = Math.min(effectiveCapVal, effectiveDiscountVal);
+                  const effectiveSharesMultiplier =
+                    comparisonNextVal > 0 ? (comparisonNextVal / winningValuation).toFixed(2) : "1.0";
+
+                  return (
+                    <div className="space-y-3 pt-2">
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div
+                          className={`p-3.5 rounded-xl border ${
+                            capWins
+                              ? "bg-orange-500/10 border-orange-500 text-foreground"
+                              : "bg-secondary/40 border-border text-muted-foreground"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span>Valuation Cap Price</span>
+                            {capWins && (
+                              <span className="text-[10px] bg-orange-500 text-white px-1.5 py-0.5 rounded font-mono">
+                                CONVERTS!
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-base font-extrabold font-mono text-foreground">
+                            {formatINR(effectiveCapVal)}
+                          </p>
+                          <p className="text-[10px] mt-1 text-muted-foreground">
+                            Capped at ₹{(valuationCap / 10000000).toFixed(2)} Cr
+                          </p>
+                        </div>
+
+                        <div
+                          className={`p-3.5 rounded-xl border ${
+                            !capWins
+                              ? "bg-orange-500/10 border-orange-500 text-foreground"
+                              : "bg-secondary/40 border-border text-muted-foreground"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold mb-1">
+                            <span>Discount Price ({discountRate}%)</span>
+                            {!capWins && (
+                              <span className="text-[10px] bg-orange-500 text-white px-1.5 py-0.5 rounded font-mono">
+                                CONVERTS!
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-base font-extrabold font-mono text-foreground">
+                            {formatINR(effectiveDiscountVal)}
+                          </p>
+                          <p className="text-[10px] mt-1 text-muted-foreground">
+                            {discountRate}% off {formatINR(comparisonNextVal)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-secondary/50 border border-border/80 text-xs space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-foreground">Effective Conversion Valuation:</span>
+                          <span className="font-mono font-extrabold text-orange-600 dark:text-orange-400">
+                            {formatINR(winningValuation)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-muted-foreground text-[11px]">
+                          <span>Angel Entry Discount vs Series A:</span>
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            {(((comparisonNextVal - winningValuation) / comparisonNextVal) * 100).toFixed(1)}% savings
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Carta-grade Instrument Comparison Table */}
+              <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                  Early-Stage Instrument Quick Comparison
+                </h4>
+                <div className="overflow-x-auto text-[11px]">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-border/60 text-muted-foreground">
+                        <th className="pb-2">Instrument</th>
+                        <th className="pb-2">Debt/Equity</th>
+                        <th className="pb-2">Maturity Date</th>
+                        <th className="pb-2">Dilution Impact</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 text-foreground">
+                      <tr>
+                        <td className="py-2 font-bold text-orange-600 dark:text-orange-400">Post-Money SAFE</td>
+                        <td className="py-2">Convertible Equity</td>
+                        <td className="py-2">None</td>
+                        <td className="py-2">Predictable (Fixed %)</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold">Pre-Money SAFE</td>
+                        <td className="py-2">Convertible Equity</td>
+                        <td className="py-2">None</td>
+                        <td className="py-2">Diluted by future SAFEs</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold">Convertible Note</td>
+                        <td className="py-2">Debt (with Interest)</td>
+                        <td className="py-2">18–24 Months</td>
+                        <td className="py-2">Accrues interest (debt)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

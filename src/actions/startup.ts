@@ -56,3 +56,52 @@ export async function createStartup(formData: FormData) {
   revalidatePath("/dashboard/startups");
   redirect("/dashboard/startups");
 }
+
+export async function updateStartupStage(startupId: string, newStage: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const dbUser = await prisma.user.findUnique({
+    where: { clerkId: userId },
+  });
+  if (!dbUser) throw new Error("User not found");
+
+  const startup = await prisma.startup.findUnique({
+    where: { id: startupId },
+  });
+  if (!startup || startup.userId !== dbUser.id) {
+    throw new Error("Startup not found or unauthorized");
+  }
+
+  const updated = await prisma.startup.update({
+    where: { id: startupId },
+    data: { stage: newStage },
+  });
+
+  revalidatePath("/dashboard/startups");
+  return { success: true, startup: updated };
+}
+
+export async function deleteStartup(startupId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const dbUser = await prisma.user.findUnique({
+    where: { clerkId: userId },
+  });
+  if (!dbUser) throw new Error("User not found");
+
+  const startup = await prisma.startup.findUnique({
+    where: { id: startupId },
+  });
+  if (!startup || startup.userId !== dbUser.id) {
+    throw new Error("Startup not found or unauthorized");
+  }
+
+  await prisma.startup.delete({
+    where: { id: startupId },
+  });
+
+  revalidatePath("/dashboard/startups");
+  return { success: true };
+}

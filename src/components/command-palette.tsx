@@ -20,6 +20,7 @@ import {
   Sparkles,
   ArrowRight,
   Calculator,
+  PieChart,
 } from "lucide-react";
 import {
   Dialog,
@@ -93,6 +94,15 @@ export function CommandPalette({
         icon: Lightbulb,
         category: "Navigation",
         action: () => navigateTo("/dashboard/recommendations"),
+      },
+      {
+        id: "nav-allocator",
+        title: "Portfolio Allocator & Power Law",
+        subtitle: "AngelList-style fund constructor, check sizing & reserve ratios",
+        icon: PieChart,
+        category: "Navigation",
+        badge: "New",
+        action: () => navigateTo("/dashboard/allocator"),
       },
       {
         id: "nav-calculator",

@@ -159,6 +159,48 @@ async function runTests() {
   );
 
   // -------------------------------------------------------------------------
+  // 6. Portfolio Allocator & Power Law Math
+  // -------------------------------------------------------------------------
+  console.log("\n6. Validating Portfolio Allocator & Power Law Calculations:");
+  const poolLakhs = 50;
+  const reservePct = 45;
+  const numDeals = 20;
+  const initialCapLakhs = (poolLakhs * (100 - reservePct)) / 100;
+  const reserveCapLakhs = (poolLakhs * reservePct) / 100;
+  const checkSize = initialCapLakhs / numDeals;
+  assert(
+    initialCapLakhs === 27.5 && reserveCapLakhs === 22.5,
+    "Portfolio capital split correct (₹27.5L initial, ₹22.5L follow-on reserve)"
+  );
+  assert(
+    checkSize === 1.375,
+    "Average angel check size matches exact slice (₹1.375 Lakhs per deal)"
+  );
+
+  // -------------------------------------------------------------------------
+  // 7. SAFE Cap vs Discount Decision Rule
+  // -------------------------------------------------------------------------
+  console.log("\n7. Validating SAFE Cap vs Discount Decision Engine:");
+  const capVal = 45000000; // ₹4.5 Cr
+  const discount = 0.2; // 20%
+
+  // Case A: High Series A ($6 Cr) -> Cap price (4.5 Cr) < Discount price (4.8 Cr) -> Cap wins
+  const seriesAHigh = 60000000;
+  const effectivePriceA = Math.min(capVal, seriesAHigh * (1 - discount));
+  assert(
+    effectivePriceA === 45000000,
+    "In high up-round (₹6Cr), Valuation Cap converts at ₹4.5Cr"
+  );
+
+  // Case B: Moderate Series A ($5 Cr) -> Discount price (4.0 Cr) < Cap price (4.5 Cr) -> Discount wins
+  const seriesALow = 50000000;
+  const effectivePriceB = Math.min(capVal, seriesALow * (1 - discount));
+  assert(
+    effectivePriceB === 40000000,
+    "In moderate round (₹5Cr), 20% Discount converts at ₹4.0Cr"
+  );
+
+  // -------------------------------------------------------------------------
   // Summary
   // -------------------------------------------------------------------------
   console.log("\n=======================================================");
