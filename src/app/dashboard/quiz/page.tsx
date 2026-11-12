@@ -2,7 +2,9 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserQuizHistory } from "@/actions/quiz";
 import { QuizEngine } from "@/components/features/quiz-engine";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +33,13 @@ export default async function QuizPage() {
             </div>
           </div>
         </div>
+
+        <Link href="/dashboard/quiz/analytics">
+          <Button variant="outline" className="border-zinc-300 dark:border-zinc-700">
+            <BarChart3 className="h-4 w-4 mr-2 text-blue-500" />
+            Performance Analytics
+          </Button>
+        </Link>
       </div>
 
       {/* Main Quiz Engine */}

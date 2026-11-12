@@ -21,7 +21,9 @@ import {
   Calculator,
   Briefcase,
   Loader2,
+  BarChart3,
 } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 
 interface QuizAttemptRecord {
@@ -224,7 +226,7 @@ export function QuizEngine({
             </p>
           </div>
 
-          <div className="flex justify-center gap-4 mt-6">
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
             <Button
               variant="outline"
               onClick={() => startQuiz(selectedTopic)}
@@ -239,6 +241,15 @@ export function QuizEngine({
             >
               Choose New Topic
             </Button>
+            <Link href="/dashboard/quiz/analytics">
+              <Button
+                variant="outline"
+                className="border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200"
+              >
+                <BarChart3 className="h-4 w-4 mr-2 text-blue-500" />
+                View Analytics
+              </Button>
+            </Link>
           </div>
         </Card>
       </div>

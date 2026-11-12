@@ -468,3 +468,185 @@ export async function getUserQuizHistory() {
     return [];
   }
 }
+
+export interface TopicAnalytics {
+  topic: string;
+  attempts: number;
+  averageScorePct: number;
+  highestScore: number;
+  totalQuestions: number;
+}
+
+export interface QuizAnalyticsData {
+  totalAttempts: number;
+  averageScorePct: number;
+  bestScorePct: number;
+  bestTopic: string | null;
+  weakestTopic: string | null;
+  topicBreakdown: TopicAnalytics[];
+  timeline: {
+    attemptNumber: number;
+    date: string;
+    topic: string;
+    score: number;
+    totalScore: number;
+    percentage: number;
+  }[];
+  recentAttempts: {
+    id: string;
+    topic: string;
+    score: number;
+    totalScore: number;
+    completedAt: Date;
+    percentage: number;
+  }[];
+}
+
+// Compute comprehensive performance analytics for the user
+export async function getQuizAnalytics(): Promise<QuizAnalyticsData> {
+  const { userId } = await auth();
+  if (!userId) {
+    return {
+      totalAttempts: 0,
+      averageScorePct: 0,
+      bestScorePct: 0,
+      bestTopic: null,
+      weakestTopic: null,
+      topicBreakdown: [],
+      timeline: [],
+      recentAttempts: [],
+    };
+  }
+
+  try {
+    const dbUser = await ensureDbUser(userId);
+
+    const attempts = await prisma.quizAttempt.findMany({
+      where: { userId: dbUser.id },
+      orderBy: { completedAt: "asc" }, // Ascending for chronological timeline
+    });
+
+    if (attempts.length === 0) {
+      return {
+        totalAttempts: 0,
+        averageScorePct: 0,
+        bestScorePct: 0,
+        bestTopic: null,
+        weakestTopic: null,
+        topicBreakdown: [],
+        timeline: [],
+        recentAttempts: [],
+      };
+    }
+
+    // 1. Overall Metrics
+    let totalScored = 0;
+    let totalPossible = 0;
+    let bestScorePct = 0;
+
+    const timeline = attempts.map((a, idx) => {
+      totalScored += a.score;
+      totalPossible += a.totalScore;
+      const pct = Math.round((a.score / a.totalScore) * 100);
+      if (pct > bestScorePct) bestScorePct = pct;
+
+      return {
+        attemptNumber: idx + 1,
+        date: new Date(a.completedAt).toLocaleDateString("en-IN", {
+          month: "short",
+          day: "numeric",
+        }),
+        topic: a.topic,
+        score: a.score,
+        totalScore: a.totalScore,
+        percentage: pct,
+      };
+    });
+
+    const averageScorePct =
+      totalPossible > 0 ? Math.round((totalScored / totalPossible) * 100) : 0;
+
+    // 2. Topic Grouping & Breakdown
+    const topicMap: Record<
+      string,
+      { attempts: number; totalScored: number; totalPossible: number; highest: number }
+    > = {};
+
+    for (const a of attempts) {
+      if (!topicMap[a.topic]) {
+        topicMap[a.topic] = {
+          attempts: 0,
+          totalScored: 0,
+          totalPossible: 0,
+          highest: 0,
+        };
+      }
+      topicMap[a.topic].attempts += 1;
+      topicMap[a.topic].totalScored += a.score;
+      topicMap[a.topic].totalPossible += a.totalScore;
+      if (a.score > topicMap[a.topic].highest) {
+        topicMap[a.topic].highest = a.score;
+      }
+    }
+
+    const topicBreakdown: TopicAnalytics[] = Object.entries(topicMap).map(
+      ([topic, data]) => ({
+        topic,
+        attempts: data.attempts,
+        averageScorePct:
+          data.totalPossible > 0
+            ? Math.round((data.totalScored / data.totalPossible) * 100)
+            : 0,
+        highestScore: data.highest,
+        totalQuestions: 5,
+      })
+    );
+
+    // Sort by averageScorePct descending
+    topicBreakdown.sort((a, b) => b.averageScorePct - a.averageScorePct);
+
+    const bestTopic = topicBreakdown.length > 0 ? topicBreakdown[0].topic : null;
+    const weakestTopic =
+      topicBreakdown.length > 1
+        ? topicBreakdown[topicBreakdown.length - 1].topic
+        : topicBreakdown.length === 1 && topicBreakdown[0].averageScorePct < 70
+        ? topicBreakdown[0].topic
+        : null;
+
+    // 3. Recent attempts (descending order)
+    const recentAttempts = [...attempts]
+      .reverse()
+      .slice(0, 15)
+      .map((a) => ({
+        id: a.id,
+        topic: a.topic,
+        score: a.score,
+        totalScore: a.totalScore,
+        completedAt: a.completedAt,
+        percentage: Math.round((a.score / a.totalScore) * 100),
+      }));
+
+    return {
+      totalAttempts: attempts.length,
+      averageScorePct,
+      bestScorePct,
+      bestTopic,
+      weakestTopic,
+      topicBreakdown,
+      timeline,
+      recentAttempts,
+    };
+  } catch (error) {
+    console.error("Quiz analytics calculation error:", error);
+    return {
+      totalAttempts: 0,
+      averageScorePct: 0,
+      bestScorePct: 0,
+      bestTopic: null,
+      weakestTopic: null,
+      topicBreakdown: [],
+      timeline: [],
+      recentAttempts: [],
+    };
+  }
+}
