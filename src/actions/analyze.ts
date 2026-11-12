@@ -29,8 +29,8 @@ export async function extractTextFromDocument(fileUrl: string) {
     const arrayBuffer = await response.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
     
-    // Construct the direct REST API URL using the latest available model
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    // Primary model: gemini-3.5-flash (with automatic fallback on 404/503)
+    const candidateModels = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest"];
     
     // Extract the body payload to make the retry loop cleaner
     const requestBody = {
@@ -55,31 +55,48 @@ export async function extractTextFromDocument(fileUrl: string) {
       }
     };
 
-    // Set up retry parameters
-    const maxRetries = 3;
-    let attempt = 0;
-    let geminiResponse;
+    let geminiResponse: Response | null = null;
+    let successfulModel = "";
 
-    // Loop to handle 503 traffic spikes automatically
-    while (attempt < maxRetries) {
-      geminiResponse = await fetch(geminiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody)
-      });
+    // Loop through candidate models if one encounters a permanent error or heavy traffic
+    for (const modelName of candidateModels) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      const maxRetries = 2;
+      let attempt = 0;
 
-      // If it's NOT a 503, break out of the loop and process the response
-      if (geminiResponse.status !== 503) {
-        break;
+      while (attempt < maxRetries) {
+        try {
+          const res = await fetch(geminiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
+
+          if (res.ok) {
+            geminiResponse = res;
+            successfulModel = modelName;
+            break;
+          }
+
+          // If 503, wait and retry
+          if (res.status === 503) {
+            attempt++;
+            console.warn(`Gemini (${modelName}) 503 busy. Retry ${attempt}/${maxRetries}...`);
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+            continue;
+          }
+
+          // If 404, break to try the next model
+          break;
+        } catch (fetchErr) {
+          console.warn(`Fetch error with ${modelName}:`, fetchErr);
+          break;
+        }
       }
 
-      attempt++;
-      console.warn(`Gemini API 503 Error. Retrying attempt ${attempt} of ${maxRetries}...`);
-      
-      // Wait 2 seconds before the next attempt
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (geminiResponse && geminiResponse.ok) {
+        break;
+      }
     }
 
     // Check if we exhausted retries or hit a different API error

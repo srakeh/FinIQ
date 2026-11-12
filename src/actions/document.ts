@@ -78,15 +78,20 @@ export async function saveDocumentAnalysis(id: string, analysisData: any) {
   if (!userId) throw new Error("Unauthorized");
 
   try {
+    const safeString = (val: any) => {
+      if (val === null || val === undefined) return null;
+      return String(val);
+    };
+
     // Use updateMany so we can safely filter by both id and userId 
     await prisma.document.updateMany({
       where: { id: id, userId: userId },
       data: {
-        documentType: analysisData.documentType,
-        accountHolder: analysisData.accountHolder,
-        netIncome: analysisData.netIncome,
-        taxDeductions: analysisData.taxDeductions,
-        portfolioValue: analysisData.portfolioValue,
+        documentType: safeString(analysisData.documentType),
+        accountHolder: safeString(analysisData.accountHolder),
+        netIncome: safeString(analysisData.netIncome),
+        taxDeductions: safeString(analysisData.taxDeductions),
+        portfolioValue: safeString(analysisData.portfolioValue),
       },
     });
     
