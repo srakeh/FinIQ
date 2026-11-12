@@ -186,8 +186,8 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
                 >
                   <defs>
                     <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#FF8000" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#FF8000" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" vertical={false} opacity={0.2} />
@@ -208,11 +208,12 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#18181b",
-                      borderColor: "#27272a",
-                      color: "#f4f4f5",
-                      borderRadius: "8px",
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
+                      color: "var(--foreground)",
+                      borderRadius: "12px",
                       fontSize: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
                     }}
                     formatter={(value: any, _name: any, item: any) => [
                       `${value}% (${item.payload.score}/${item.payload.totalScore})`,
@@ -222,7 +223,7 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
                   <Area
                     type="monotone"
                     dataKey="percentage"
-                    stroke="#10b981"
+                    stroke="#FF8000"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#scoreGradient)"
@@ -274,11 +275,12 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#18181b",
-                      borderColor: "#27272a",
-                      color: "#f4f4f5",
-                      borderRadius: "8px",
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
+                      color: "var(--foreground)",
+                      borderRadius: "12px",
                       fontSize: "12px",
+                      boxShadow: "0 10px 25px -5px rgba(0,0,0,0.3)",
                     }}
                     formatter={(value: any, _name: any, item: any) => [
                       `${value}% avg (${item.payload.attempts} attempts)`,
@@ -287,8 +289,8 @@ export function QuizAnalyticsView({ data }: { data: QuizAnalyticsData }) {
                   />
                   <Bar
                     dataKey="accuracy"
-                    fill="#3b82f6"
-                    radius={[4, 4, 0, 0]}
+                    fill="#F59E0B"
+                    radius={[6, 6, 0, 0]}
                     maxBarSize={45}
                   />
                 </BarChart>

@@ -22,7 +22,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <strong
           key={index}
-          className="font-semibold text-zinc-950 dark:text-zinc-50"
+          className="font-bold text-foreground"
         >
           {part.slice(2, -2)}
         </strong>
@@ -33,7 +33,7 @@ function renderInline(text: string): React.ReactNode[] {
       return (
         <code
           key={index}
-          className="px-1.5 py-0.5 rounded bg-zinc-200/80 dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 font-mono text-xs"
+          className="px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 font-mono text-xs"
         >
           {part.slice(1, -1)}
         </code>
@@ -42,7 +42,7 @@ function renderInline(text: string): React.ReactNode[] {
 
     if (part.startsWith("*") && part.endsWith("*") && part.length >= 2) {
       return (
-        <em key={index} className="italic text-zinc-700 dark:text-zinc-300">
+        <em key={index} className="italic text-muted-foreground">
           {part.slice(1, -1)}
         </em>
       );
@@ -152,14 +152,14 @@ export function FormattedMessage({ content }: FormattedMessageProps) {
   flushList();
 
   return (
-    <div className="space-y-3 text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed">
+    <div className="space-y-3 text-sm text-foreground/90 leading-relaxed">
       {blocks.map((block, idx) => {
         switch (block.type) {
           case "h1":
             return (
               <h1
                 key={idx}
-                className="text-lg font-bold text-zinc-950 dark:text-zinc-50 pt-3 pb-1 first:pt-0 border-b border-zinc-200 dark:border-zinc-800"
+                className="text-lg font-bold text-foreground pt-3 pb-1 first:pt-0 border-b border-border"
               >
                 {renderInline(block.text)}
               </h1>
@@ -168,7 +168,7 @@ export function FormattedMessage({ content }: FormattedMessageProps) {
             return (
               <h2
                 key={idx}
-                className="text-base font-bold text-zinc-950 dark:text-zinc-50 pt-2 pb-0.5 first:pt-0"
+                className="text-base font-bold text-foreground pt-2 pb-0.5 first:pt-0"
               >
                 {renderInline(block.text)}
               </h2>
@@ -177,8 +177,9 @@ export function FormattedMessage({ content }: FormattedMessageProps) {
             return (
               <h3
                 key={idx}
-                className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 pt-2 pb-0.5 first:pt-0 tracking-wide uppercase"
+                className="text-xs font-bold text-orange-600 dark:text-orange-400 pt-2 pb-0.5 first:pt-0 tracking-wider uppercase flex items-center gap-1.5"
               >
+                <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
                 {renderInline(block.text)}
               </h3>
             );
@@ -187,8 +188,8 @@ export function FormattedMessage({ content }: FormattedMessageProps) {
               <ul key={idx} className="space-y-2 my-2 pl-0.5">
                 {block.items.map((item, itemIdx) => (
                   <li key={itemIdx} className="flex items-start gap-2.5">
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-2 shrink-0" />
-                    <div className="flex-1 leading-relaxed text-zinc-800 dark:text-zinc-200">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 shrink-0 shadow-[0_0_6px_rgba(255,128,0,0.6)]" />
+                    <div className="flex-1 leading-relaxed text-foreground/90">
                       {renderInline(item)}
                     </div>
                   </li>
@@ -200,10 +201,10 @@ export function FormattedMessage({ content }: FormattedMessageProps) {
               <ol key={idx} className="space-y-2 my-2 pl-0.5">
                 {block.items.map((item, itemIdx) => (
                   <li key={itemIdx} className="flex items-start gap-2.5">
-                    <span className="font-semibold text-xs text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0">
+                    <span className="font-bold text-xs text-orange-600 dark:text-orange-400 mt-0.5 shrink-0">
                       {item.num}.
                     </span>
-                    <div className="flex-1 leading-relaxed text-zinc-800 dark:text-zinc-200">
+                    <div className="flex-1 leading-relaxed text-foreground/90">
                       {renderInline(item.text)}
                     </div>
                   </li>

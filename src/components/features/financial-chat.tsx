@@ -91,17 +91,17 @@ export function FinancialChat() {
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-1 px-2 py-4">
+      <div className="flex-1 overflow-y-auto space-y-2 px-3 py-4">
         {messages.length === 0 && !isLoading && (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
-            <div className="p-4 rounded-full bg-emerald-50 dark:bg-emerald-950/50">
-              <Sparkles className="h-10 w-10 text-emerald-500" />
+            <div className="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-500 shadow-[0_0_25px_rgba(255,128,0,0.15)]">
+              <Sparkles className="h-10 w-10 text-orange-500" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+              <h2 className="text-xl font-bold tracking-tight text-foreground">
                 FinIQ Advisor
               </h2>
-              <p className="text-zinc-500 mt-1 max-w-md text-sm">
+              <p className="text-muted-foreground mt-1.5 max-w-md text-sm leading-relaxed">
                 Your AI financial consultant. Ask about tax optimization,
                 portfolio analysis, angel investing, or get personalized
                 insights from your uploaded documents.
@@ -114,7 +114,7 @@ export function FinancialChat() {
                 <button
                   key={prompt}
                   onClick={() => handleSend(prompt)}
-                  className="px-3 py-1.5 text-xs rounded-full border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 dark:hover:bg-emerald-950/50 dark:hover:border-emerald-700 dark:hover:text-emerald-400 transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium rounded-full border border-border/70 bg-card/50 text-muted-foreground hover:bg-orange-500/10 hover:border-orange-500/40 hover:text-orange-500 dark:hover:text-orange-400 transition-all duration-150"
                 >
                   {prompt}
                 </button>
@@ -126,18 +126,18 @@ export function FinancialChat() {
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex gap-3 py-4 px-3 rounded-lg ${
+            className={`flex gap-3 py-3.5 px-3.5 rounded-xl transition-colors ${
               msg.role === "assistant"
-                ? "bg-zinc-50 dark:bg-zinc-900/50"
-                : ""
+                ? "bg-card/70 border border-border/50 shadow-sm"
+                : "bg-accent/40"
             }`}
           >
             {/* Avatar */}
             <div
-              className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
+              className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shadow-sm ${
                 msg.role === "assistant"
-                  ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600"
-                  : "bg-blue-100 dark:bg-blue-900/50 text-blue-600"
+                  ? "bg-orange-500/15 border border-orange-500/30 text-orange-500"
+                  : "bg-secondary text-secondary-foreground border border-border"
               }`}
             >
               {msg.role === "assistant" ? (
@@ -149,13 +149,13 @@ export function FinancialChat() {
 
             {/* Message Content */}
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-zinc-400 mb-1">
+              <p className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase mb-1">
                 {msg.role === "assistant" ? "FinIQ Advisor" : "You"}
               </p>
               {msg.role === "assistant" ? (
                 <FormattedMessage content={msg.content} />
               ) : (
-                <div className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed break-words">
+                <div className="text-sm text-foreground whitespace-pre-wrap leading-relaxed break-words">
                   {msg.content}
                 </div>
               )}
@@ -165,20 +165,20 @@ export function FinancialChat() {
 
         {/* Loading indicator */}
         {isLoading && (
-          <div className="flex gap-3 py-4 px-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/50">
-            <div className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600">
+          <div className="flex gap-3 py-3.5 px-3.5 rounded-xl bg-card/60 border border-border/50">
+            <div className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-orange-500/15 border border-orange-500/30 text-orange-500">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="flex items-center gap-2 text-sm text-zinc-500">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Thinking...</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
+              <span>Analyzing financial models...</span>
             </div>
           </div>
         )}
 
         {/* Error message */}
         {error && (
-          <div className="flex items-center gap-2 p-3 mx-3 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm">
+          <div className="flex items-center gap-2 p-3 mx-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <p>{error}</p>
           </div>
@@ -194,7 +194,7 @@ export function FinancialChat() {
             <button
               key={prompt}
               onClick={() => handleSend(prompt)}
-              className="shrink-0 px-3 py-1 text-xs rounded-full border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-700 dark:hover:bg-emerald-950/50 dark:hover:border-emerald-700 dark:hover:text-emerald-400 transition-colors"
+              className="shrink-0 px-3 py-1 text-xs font-medium rounded-full border border-border/70 bg-card/50 text-muted-foreground hover:bg-orange-500/10 hover:border-orange-500/40 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
             >
               {prompt}
             </button>
@@ -203,15 +203,15 @@ export function FinancialChat() {
       )}
 
       {/* Input Area */}
-      <div className="border-t border-zinc-200 dark:border-zinc-800 p-4">
+      <div className="border-t border-border/60 p-4 bg-card/40 backdrop-blur-md">
         <div className="flex items-end gap-2 max-w-4xl mx-auto">
           <Textarea
             ref={textareaRef}
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about your finances, taxes, investments..."
-            className="resize-none min-h-[44px] max-h-[120px] text-sm bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 focus-visible:ring-emerald-500"
+            placeholder="Ask about your finances, taxes, angel investments..."
+            className="resize-none min-h-[44px] max-h-[120px] text-sm bg-background border-border/80 focus-visible:ring-orange-500"
             rows={1}
             disabled={isLoading}
           />
@@ -219,7 +219,7 @@ export function FinancialChat() {
             onClick={() => handleSend()}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="shrink-0 h-[44px] w-[44px] bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
+            className="shrink-0 h-[44px] w-[44px] bg-orange-500 hover:bg-orange-600 text-white shadow-[0_0_15px_rgba(255,128,0,0.35)] disabled:opacity-50 transition-all duration-150"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -228,9 +228,8 @@ export function FinancialChat() {
             )}
           </Button>
         </div>
-        <p className="text-[10px] text-zinc-400 text-center mt-2">
-          AI-generated financial guidance. Not a substitute for certified
-          financial advice.
+        <p className="text-[10px] text-muted-foreground text-center mt-2">
+          FinIQ AI-generated guidance. Grounded in uploaded documents and financial models.
         </p>
       </div>
     </div>

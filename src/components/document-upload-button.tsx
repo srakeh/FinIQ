@@ -86,7 +86,7 @@ export function DocumentUploadButton() {
       {/* 1. The Trigger Button */}
       <Button 
         onClick={() => setIsOpen(true)}
-        className="bg-emerald-500 hover:bg-emerald-600 text-white"
+        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-[0_0_15px_rgba(255,128,0,0.3)]"
       >
         <UploadCloud className="mr-2 h-4 w-4" /> Upload Document
       </Button>
@@ -106,13 +106,13 @@ export function DocumentUploadButton() {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg mt-2 transition-colors duration-200 ${
+            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl mt-2 transition-colors duration-200 ${
               isDragging 
-                ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20" 
-                : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50"
+                ? "border-orange-500 bg-orange-500/10" 
+                : "border-border/70 bg-card/50"
             }`}
           >
-            <FileText className={`w-10 h-10 mb-4 ${isDragging ? "text-emerald-500" : "text-zinc-300 dark:text-zinc-700"}`} />
+            <FileText className={`w-10 h-10 mb-4 ${isDragging ? "text-orange-500" : "text-muted-foreground/40"}`} />
             
             <input
               type="file"
@@ -126,7 +126,7 @@ export function DocumentUploadButton() {
               onClick={() => fileInputRef.current?.click()} 
               disabled={isUploading}
               variant={isDragging ? "default" : "outline"}
-              className={isDragging ? "bg-emerald-500 hover:bg-emerald-600 text-white pointer-events-none" : ""}
+              className={isDragging ? "bg-orange-500 hover:bg-orange-600 text-white pointer-events-none" : "border-border hover:border-orange-500/30"}
             >
               {isUploading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

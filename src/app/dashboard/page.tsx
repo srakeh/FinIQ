@@ -5,14 +5,14 @@ import prisma from "@/lib/prisma";
 import { DocumentCard } from "@/components/features/document-card";
 import { ExportButton } from "@/components/features/export-button";
 import { DocumentUploadButton } from "@/components/document-upload-button";
-import { IndianRupee, TrendingDown, Wallet, AlertCircle } from "lucide-react"; 
+import { IndianRupee, TrendingDown, Wallet, AlertCircle, Sparkles } from "lucide-react"; 
 
 // Dynamically import heavy Recharts visualization to reduce initial JS bundle size
 const FinancialChart = dynamic(
   () => import("@/components/features/financial-chart").then((mod) => mod.FinancialChart),
   {
     loading: () => (
-      <div className="h-[300px] w-full rounded-2xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-pulse mb-8" />
+      <div className="h-[300px] w-full rounded-2xl bg-card border border-border/60 animate-pulse mb-8" />
     ),
   }
 ); 
@@ -53,7 +53,7 @@ export default async function DashboardPage() {
     <main className="max-w-6xl mx-auto p-6 space-y-8">
       {/* DB Connection Notice if applicable */}
       {dbError && (
-        <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <p>{dbError}</p>
         </div>
@@ -62,8 +62,17 @@ export default async function DashboardPage() {
       {/* Header with Upload and Export Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Financial Dashboard</h1>
-          <p className="text-zinc-500 mt-1">Manage your financial documents and track AI-extracted insights.</p>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-orange-500">
+              Portfolio Overview
+            </span>
+          </div>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            Financial Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Manage your financial documents and track AI-extracted metrics in real time.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <DocumentUploadButton />
@@ -73,36 +82,62 @@ export default async function DashboardPage() {
 
       {/* Summary Widgets */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-          <div className="flex items-center gap-3 text-zinc-500 mb-2">
-            <Wallet className="h-5 w-5 text-blue-500" />
-            <h3 className="text-sm font-medium">Total Net Income</h3>
+        <div className="p-6 bg-card border border-border/70 rounded-2xl shadow-sm mclaren-card-hover space-y-2">
+          <div className="flex items-center justify-between text-muted-foreground mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">Total Net Income</span>
+            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
+              <Wallet className="h-4 w-4" />
+            </div>
           </div>
-          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{formatINR(totalIncome)}</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums tracking-tight">
+            {formatINR(totalIncome)}
+          </p>
+          <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+            <span>Aggregated across verified filings</span>
+          </p>
         </div>
         
-        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-          <div className="flex items-center gap-3 text-zinc-500 mb-2">
-            <TrendingDown className="h-5 w-5 text-red-500" />
-            <h3 className="text-sm font-medium">Total Tax Deductions</h3>
+        <div className="p-6 bg-card border border-border/70 rounded-2xl shadow-sm mclaren-card-hover space-y-2">
+          <div className="flex items-center justify-between text-muted-foreground mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">Total Tax Deductions</span>
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              <TrendingDown className="h-4 w-4" />
+            </div>
           </div>
-          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{formatINR(totalTaxes)}</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums tracking-tight">
+            {formatINR(totalTaxes)}
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Section 80C, 80D, and capital deductions
+          </p>
         </div>
 
-        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-          <div className="flex items-center gap-3 text-zinc-500 mb-2">
-            <IndianRupee className="h-5 w-5 text-emerald-500" />
-            <h3 className="text-sm font-medium">Documents Analyzed</h3>
+        <div className="p-6 bg-card border border-border/70 rounded-2xl shadow-sm mclaren-card-hover space-y-2">
+          <div className="flex items-center justify-between text-muted-foreground mb-1">
+            <span className="text-xs font-bold uppercase tracking-wider">Documents Analyzed</span>
+            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
+              <Sparkles className="h-4 w-4" />
+            </div>
           </div>
-          <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{analyzedCount}</p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-foreground font-mono tabular-nums tracking-tight">
+            {analyzedCount}
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            Processed via Gemini 3.1 Flash-Lite
+          </p>
         </div>
       </div>
 
       {/* Chart and Documents Grid */}
       {documents.length === 0 ? (
-        <div className="text-center p-12 border-2 border-dashed border-zinc-200 rounded-lg dark:border-zinc-800 space-y-4">
-          <p className="text-zinc-500">No documents uploaded yet. Start by uploading a financial document to analyze with AI!</p>
-          <div className="inline-block">
+        <div className="text-center p-12 border-2 border-dashed border-border rounded-2xl space-y-4 bg-card/40">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <p className="text-muted-foreground max-w-sm mx-auto text-sm">
+            No documents uploaded yet. Start by uploading a financial statement, payslip, or cap table to analyze with AI!
+          </p>
+          <div className="inline-block pt-2">
             <DocumentUploadButton />
           </div>
         </div>

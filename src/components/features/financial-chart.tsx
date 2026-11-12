@@ -15,40 +15,55 @@ export function FinancialChart({ documents }: { documents: any[] }) {
   const chartData = documents
     .filter(doc => parseCurrency(doc.netIncome) > 0 || parseCurrency(doc.taxDeductions) > 0)
     .map(doc => ({
-      // Shorten long titles so they fit nicely on the X-axis
       name: doc.title.length > 15 ? doc.title.substring(0, 15) + "..." : doc.title,
       Income: parseCurrency(doc.netIncome),
       Taxes: parseCurrency(doc.taxDeductions),
     }))
-    .slice(0, 5) // Show only the 5 most recent documents
+    .slice(0, 5)
     .reverse(); 
 
-  // Hide the chart entirely if no documents have extracted numbers yet
   if (chartData.length === 0) {
     return null; 
   }
 
   return (
-    <Card className="mb-8 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm min-w-0">
-      <CardHeader>
-        <CardTitle className="text-zinc-900 dark:text-zinc-50">Income vs. Taxes</CardTitle>
-        <CardDescription className="text-zinc-500">Financial breakdown of recent documents</CardDescription>
+    <Card className="mb-8 bg-card border-border/70 rounded-2xl shadow-sm min-w-0">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(255,128,0,0.8)]" />
+          <CardTitle className="text-foreground text-lg font-bold">Income vs. Taxes Breakdown</CardTitle>
+        </div>
+        <CardDescription className="text-muted-foreground text-xs">
+          Financial performance ratio of recent documents
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full mt-4 min-w-0">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" vertical={false} opacity={0.3} />
-              <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" vertical={false} opacity={0.12} />
+              <XAxis dataKey="name" stroke="currentColor" fontSize={11} tickLine={false} axisLine={false} opacity={0.6} />
+              <YAxis stroke="currentColor" fontSize={11} tickLine={false} axisLine={false} opacity={0.6} />
               <Tooltip 
-                cursor={{ fill: 'rgba(161, 161, 170, 0.1)' }}
-                contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#f4f4f5', borderRadius: '8px' }}
-                itemStyle={{ fontSize: '14px' }}
+                cursor={{ fill: 'rgba(255, 128, 0, 0.06)' }}
+                contentStyle={{
+                  backgroundColor: 'var(--card)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--foreground)',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+                  borderWidth: '1px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+                formatter={(value: any) => [
+                  `₹${Number(value || 0).toLocaleString("en-IN")}`,
+                  undefined,
+                ]}
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }}/>
-              <Bar dataKey="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={60} />
-              <Bar dataKey="Taxes" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={60} />
+              <Legend wrapperStyle={{ paddingTop: '16px', fontSize: '12px' }}/>
+              <Bar dataKey="Income" name="Net Income" fill="#FF8000" radius={[6, 6, 0, 0]} maxBarSize={50} />
+              <Bar dataKey="Taxes" name="Tax Deductions" fill="#F59E0B" radius={[6, 6, 0, 0]} maxBarSize={50} />
             </BarChart>
           </ResponsiveContainer>
         </div>

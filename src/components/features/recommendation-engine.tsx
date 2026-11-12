@@ -50,9 +50,9 @@ export function RecommendationEngine() {
   };
 
   const scoreColor = (score: number) => {
-    if (score >= 85) return "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800";
-    if (score >= 75) return "text-blue-600 bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800";
-    return "text-amber-600 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800";
+    if (score >= 85) return "text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/30";
+    if (score >= 75) return "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30";
+    return "text-muted-foreground bg-accent border-border";
   };
 
   return (
@@ -60,17 +60,17 @@ export function RecommendationEngine() {
       {/* Generate Button */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          <h2 className="text-lg font-bold text-foreground tracking-tight">
             AI-Powered Matches
           </h2>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             Personalized startup recommendations based on your investor profile.
           </p>
         </div>
         <Button
           onClick={handleGenerate}
           disabled={isLoading}
-          className="bg-emerald-500 hover:bg-emerald-600 text-white"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-[0_0_15px_rgba(255,128,0,0.3)]"
         >
           {isLoading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -174,11 +174,11 @@ export function RecommendationEngine() {
                     {rec.risks}
                   </p>
                 </div>
-                <div className="p-3 rounded-lg bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 mb-1">
+                <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-600 dark:text-orange-400 mb-1">
                     <TrendingUp className="h-3 w-3" /> OPPORTUNITY
                   </div>
-                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-foreground/80 leading-relaxed">
                     {rec.opportunity}
                   </p>
                 </div>

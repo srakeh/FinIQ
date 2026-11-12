@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
 // Our navigation links
@@ -26,10 +27,10 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar className="border-r border-sidebar-border bg-sidebar transition-colors">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-emerald-500 font-bold tracking-wide">
+          <SidebarGroupLabel className="text-orange-500 font-bold tracking-wider uppercase text-[11px] px-2 py-3">
             FinIQ Platform
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -37,9 +38,9 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <Link href={item.url} className="w-full block">
-                    <SidebarMenuButton>
+                    <SidebarMenuButton className="hover:bg-sidebar-accent hover:text-orange-500 dark:hover:text-orange-400 data-[active=true]:bg-orange-500/10 data-[active=true]:text-orange-500 transition-colors duration-150">
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span className="font-medium text-sm">{item.title}</span>
                     </SidebarMenuButton>
                   </Link>
                 </SidebarMenuItem>
@@ -48,10 +49,11 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center gap-3">
+      <SidebarFooter className="p-3 border-t border-sidebar-border flex flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
           <UserButton showName />
         </div>
+        <ThemeToggle className="shrink-0" />
       </SidebarFooter>
     </Sidebar>
   );
