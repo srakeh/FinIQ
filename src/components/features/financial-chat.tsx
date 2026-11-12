@@ -10,6 +10,8 @@ import {
   User,
   Sparkles,
   AlertCircle,
+  Volume2,
+  Square,
 } from "lucide-react";
 import { sendChatMessage } from "@/actions/chat";
 import { FormattedMessage } from "@/components/features/formatted-message";
@@ -36,6 +38,7 @@ export function FinancialChat({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasTriggeredInitial = useRef(false);
@@ -51,6 +54,46 @@ export function FinancialChat({
       handleSend(initialPrompt);
     }
   }, [initialPrompt]);
+
+  // Voice narration handler using Web Speech Synthesis
+  const toggleSpeech = (text: string, index: number) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return;
+    }
+
+    if (speakingIdx === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIdx(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    // Strip markdown formatting symbols for natural voice narration
+    const cleanSpeech = text
+      .replace(/[*#`_~]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanSpeech);
+    utterance.rate = 1.05; // Modern executive tempo
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => setSpeakingIdx(null);
+    utterance.onerror = () => setSpeakingIdx(null);
+
+    setSpeakingIdx(index);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Cancel speech on unmount
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleSend = async (messageText?: string) => {
     const text = (messageText || input).trim();
@@ -161,9 +204,35 @@ export function FinancialChat({
 
             {/* Message Content */}
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase mb-1">
-                {msg.role === "assistant" ? "FinIQ Advisor" : "You"}
-              </p>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[11px] font-bold text-muted-foreground tracking-wide uppercase">
+                  {msg.role === "assistant" ? "FinIQ Advisor" : "You"}
+                </p>
+                {msg.role === "assistant" && (
+                  <button
+                    onClick={() => toggleSpeech(msg.content, idx)}
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md hover:bg-accent text-xs font-semibold text-muted-foreground hover:text-orange-500 transition-colors"
+                    title={speakingIdx === idx ? "Stop narration" : "Listen to audio brief"}
+                  >
+                    {speakingIdx === idx ? (
+                      <>
+                        <Square className="w-3 h-3 text-orange-500 fill-orange-500" />
+                        <span className="text-[10px] text-orange-500 font-bold flex items-center gap-0.5">
+                          <span className="inline-block w-0.5 h-2 bg-orange-500 animate-pulse" />
+                          <span className="inline-block w-0.5 h-3 bg-orange-500 animate-pulse delay-75" />
+                          <span className="inline-block w-0.5 h-2 bg-orange-500 animate-pulse delay-150" />
+                          Stop
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5 text-muted-foreground hover:text-orange-500" />
+                        <span className="text-[10px] font-semibold">Listen</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
               {msg.role === "assistant" ? (
                 <FormattedMessage content={msg.content} />
               ) : (
