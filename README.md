@@ -199,6 +199,24 @@ erDiagram
 - Interactive 5-question quizzes covering SAFE notes, 409A valuations, pre/post-money math, and angel tax rules.
 - Real-time Recharts visualization tracking category mastery, average scores, and accuracy trends.
 
+### 5. AngelList-Style Portfolio Allocator & Power-Law Model (`/dashboard/allocator`)
+- Institutional venture constructor modeling power-law distributions (60% write-offs, 25% capital back, 10% solid hits, 5% home runs).
+- Dynamic allocation sliders for total investment pool, number of startup bets, and 40%–50% follow-on reserve war chest.
+- Real-time blended MOIC and 7-year annualized IRR projections.
+
+### 6. Harmonic-Style Dealflow Pipeline Kanban & 5-Axis Diligence (`/dashboard/startups`)
+- Interactive view switcher between **5-Axis Radar Diligence Grid** and **Harmonic-grade Kanban Pipeline Board** (Screening → Due Diligence → Partner Pitch → Term Sheet → Invested).
+- Live stage updater and 1-click printable confidential **Executive Deal Memo modal** with browser print/PDF styling.
+
+### 7. Carta-Style Cap Table, Cash Runway & Clause Inspector (`/dashboard/calculator`)
+- **SAFE Conversion & Dilution Waterfall**: Pre-money vs Post-money SAFE modeling into priced Series A and exit distributions.
+- **Cash Runway & Default Alive Forecaster**: 24-month interactive cash burn trajectory and profitability inflection calculator.
+- **Term Sheet Clause Auditor**: Checklist scoring Valuation Caps, Discounts, Pro-Rata Rights, Information Rights, and MFN clauses with an interactive Cap vs Discount conversion inspector.
+
+### 8. Voice Audio Narration & McLaren Design System
+- Built-in browser **Web Speech synthesis** with animated audio soundwave visualizers for hands-free financial intelligence briefings.
+- **McLaren Formula 1 Design Language**: Carbon Black & Papaya Orange (`#FF8000`) in Dark mode, Alpine White & Papaya in Light mode, with instant keyboard command palette (`Cmd + K`).
+
 ---
 
 ## 🛡️ Security & Hardening
@@ -251,8 +269,16 @@ Expected output:
   ✓ PASS: Investor ownership calculation correct (₹1Cr / ₹5Cr = 20.00%)
   ✓ PASS: Seed investor dilution calculation correct (20% diluted to 16% in 20% Series A round)
 
+6. Validating Portfolio Allocator & Power Law Calculations:
+  ✓ PASS: Portfolio capital split correct (₹27.5L initial, ₹22.5L follow-on reserve)
+  ✓ PASS: Average angel check size matches exact slice (₹1.375 Lakhs per deal)
+
+7. Validating SAFE Cap vs Discount Decision Engine:
+  ✓ PASS: In high up-round (₹6Cr), Valuation Cap converts at ₹4.5Cr
+  ✓ PASS: In moderate round (₹5Cr), 20% Discount converts at ₹4.0Cr
+
 =======================================================
-TOTAL TESTS: 12 | PASSED: 12 | FAILED: 0
+TOTAL TESTS: 16 | PASSED: 16 | FAILED: 0
 =======================================================
 ```
 
