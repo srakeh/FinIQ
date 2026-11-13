@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
+import { CharacterGlow } from "@/components/character-glow";
 
 export default async function HomePage() {
   const { userId } = await auth();
@@ -84,9 +85,7 @@ export default async function HomePage() {
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-4xl text-foreground">
             Autonomous Intelligence for{" "}
-            <span className="inline-block cursor-pointer papaya-text-glow text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600">
-              Venture Syndicates
-            </span>
+            <CharacterGlow text="Venture Syndicates" />
           </h1>
 
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed">

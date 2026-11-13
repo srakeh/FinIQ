@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { LOGO_COLLECTION, LogoId, LogoDefinition } from "@/components/logo";
-import { Check, Sparkles, Palette, Eye, ShieldCheck } from "lucide-react";
+import { Check, Sparkles, Palette, Eye, Search, Flame } from "lucide-react";
 import { toast } from "sonner";
 
 export function LogoStudio() {
-  const [activeLogoId, setActiveLogoId] = useState<LogoId>("delta-vertex");
+  const [activeLogoId, setActiveLogoId] = useState<LogoId>("lens-inspection-f");
   const [previewTheme, setPreviewTheme] = useState<"dark" | "light">("dark");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
 
   useEffect(() => {
     const saved = localStorage.getItem("finiq-active-logo") as LogoId | null;
@@ -36,6 +37,13 @@ export function LogoStudio() {
   const currentDef =
     LOGO_COLLECTION.find((l) => l.id === activeLogoId) || LOGO_COLLECTION[0];
 
+  const filteredLogos = LOGO_COLLECTION.filter((logo) => {
+    if (filterCategory === "lens") return logo.category === "Due Diligence Lens";
+    if (filterCategory === "favorites")
+      return ["ascending-horizon", "fq-monolith", "tech-matrix"].includes(logo.id);
+    return true;
+  });
+
   return (
     <div className="space-y-8">
       {/* Studio Header & Live Preview */}
@@ -49,7 +57,7 @@ export function LogoStudio() {
             Logo & Visual Emblem Selection
           </h2>
           <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-            Choose from 10 bespoke vector emblems designed for high-velocity venture syndicates.
+            Choose from bespoke vector emblems designed for venture syndicates.
             Click any logo to set it as the active global emblem across headers, sidebars, and deal memos.
           </p>
         </div>
@@ -71,7 +79,7 @@ export function LogoStudio() {
                 </span>
                 <span className="ml-1 w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
               </div>
-              <p className="text-[10px] font-mono text-orange-600 dark:text-orange-400 font-semibold">
+              <p className="text-[10px] font-mono text-orange-600 dark:text-orange-400 font-semibold truncate max-w-[180px]">
                 {currentDef.name}
               </p>
             </div>
@@ -79,14 +87,53 @@ export function LogoStudio() {
         </div>
       </div>
 
-      {/* Theme Canvas Preview Toggle */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          <Eye className="w-3.5 h-3.5 text-orange-500" />
-          10 Master Vector Concepts
-        </h3>
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground text-[11px]">Preview background:</span>
+      {/* Filter Category & Theme Canvas Preview Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-4">
+        {/* Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+          <button
+            type="button"
+            onClick={() => setFilterCategory("lens")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              filterCategory === "lens"
+                ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Search className="w-3.5 h-3.5" />
+            <span>Magnifying Lens Series</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20">5 New</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterCategory("favorites")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              filterCategory === "favorites"
+                ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5" />
+            <span>Your Top 3 Picks (#04, #05, #10)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setFilterCategory("all")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              filterCategory === "all"
+                ? "bg-orange-500 text-white shadow-md shadow-orange-500/20"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <span>All 14 Designs</span>
+          </button>
+        </div>
+
+        {/* Theme Canvas Preview Toggle */}
+        <div className="flex items-center gap-2 text-xs shrink-0">
+          <span className="text-muted-foreground text-[11px]">Canvas:</span>
           <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
             <button
               type="button"
@@ -114,9 +161,9 @@ export function LogoStudio() {
         </div>
       </div>
 
-      {/* 10 Logos Grid */}
+      {/* Logos Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {LOGO_COLLECTION.map((logo, idx) => {
+        {filteredLogos.map((logo, idx) => {
           const isActive = activeLogoId === logo.id;
 
           return (
@@ -149,9 +196,16 @@ export function LogoStudio() {
                       </span>
                       <span className="ml-1 w-1.5 h-1.5 rounded-full bg-orange-500" />
                     </div>
-                    <span className="text-[10px] font-mono tracking-wider opacity-70 uppercase">
-                      Option {String(idx + 1).padStart(2, "0")} • {logo.category}
-                    </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] font-mono tracking-wider opacity-70 uppercase">
+                        {logo.category}
+                      </span>
+                      {logo.isNewHighlight && (
+                        <span className="px-1.5 py-0.2 rounded-full bg-orange-500/20 text-orange-400 font-bold text-[9px] border border-orange-500/40">
+                          NEW
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
