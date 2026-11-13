@@ -52,9 +52,9 @@ export default async function HomePage() {
             <ThemeToggle />
 
             {userId ? (
-              <Link href="/dashboard">
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(255,128,0,0.3)]">
-                  Dashboard <ArrowRight className="h-4 w-4" />
+              <Link href="/dashboard" className="btn-glow-wrapper rounded-xl">
+                <Button className="btn-glow-inner text-white font-bold flex items-center gap-2 h-9 px-4 rounded-xl text-xs">
+                  Dashboard <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               </Link>
             ) : (
@@ -64,8 +64,8 @@ export default async function HomePage() {
                     Sign In
                   </Button>
                 </Link>
-                <Link href="/sign-in">
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-[0_0_15px_rgba(255,128,0,0.3)]">
+                <Link href="/sign-in" className="btn-glow-wrapper rounded-xl">
+                  <Button className="btn-glow-inner text-white font-bold text-xs h-9 px-4 rounded-xl">
                     Get Started Free
                   </Button>
                 </Link>
@@ -78,7 +78,7 @@ export default async function HomePage() {
       {/* Hero Section */}
       <main className="flex-1">
         <section className="max-w-6xl mx-auto px-6 pt-20 pb-16 flex flex-col items-center text-center justify-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/25 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/30 shadow-sm shimmer-badge">
             <Zap className="h-3.5 w-3.5 text-orange-500 fill-orange-500" />
             <span>Institutional-Grade Angel Investment & Deal Intelligence</span>
           </div>
@@ -93,10 +93,10 @@ export default async function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
-            <Link href={userId ? "/dashboard" : "/sign-in"}>
+            <Link href={userId ? "/dashboard" : "/sign-in"} className="btn-glow-wrapper rounded-2xl">
               <Button
                 size="lg"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 h-12 shadow-[0_0_25px_rgba(255,128,0,0.35)] flex items-center gap-2 transition-transform active:scale-[0.98]"
+                className="btn-glow-inner text-white font-bold text-base px-8 h-13 rounded-2xl flex items-center gap-2"
               >
                 {userId ? "Open Angel Workstation" : "Start Analyzing Deals Free"} <ArrowRight className="h-4 w-4" />
               </Button>
@@ -105,7 +105,7 @@ export default async function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 px-6 border-border/80 hover:border-orange-500/30 hover:bg-accent font-semibold"
+                className="h-13 px-6 rounded-2xl border-border/80 btn-ghost-glow font-semibold"
               >
                 <Coins className="w-4 h-4 mr-2 text-orange-500" /> Model Cap Table Dilution
               </Button>
@@ -114,7 +114,7 @@ export default async function HomePage() {
 
           {/* Interactive Floating Product Telemetry Preview Card */}
           <div className="w-full max-w-4xl pt-10">
-            <div className="relative rounded-3xl border border-border/80 bg-card/80 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl mclaren-glow text-left overflow-hidden">
+            <div className="relative rounded-3xl border border-border/80 card-glow-premium backdrop-blur-2xl p-6 sm:p-8 shadow-2xl text-left overflow-hidden">
               <div className="flex items-center justify-between border-b border-border/60 pb-4 mb-6">
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1.5">
@@ -235,7 +235,7 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <UploadCloud className="h-5 w-5" />
                 </div>
@@ -245,7 +245,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <BrainCircuit className="h-5 w-5" />
                 </div>
@@ -255,7 +255,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <Coins className="h-5 w-5" />
                 </div>
@@ -265,7 +265,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <FileText className="h-5 w-5" />
                 </div>
@@ -275,7 +275,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <GraduationCap className="h-5 w-5" />
                 </div>
@@ -285,7 +285,7 @@ export default async function HomePage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-2xl border border-border/70 bg-card/70 backdrop-blur-md shadow-sm space-y-3 mclaren-card-hover">
+              <div className="p-6 rounded-2xl border border-border/70 card-glow-premium backdrop-blur-md shadow-sm space-y-3">
                 <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-500 flex items-center justify-center">
                   <ShieldCheck className="h-5 w-5" />
                 </div>
@@ -393,12 +393,12 @@ export default async function HomePage() {
               Join angel syndicates, venture scouts, and high-net-worth investors making smarter early-stage bets with FinIQ.
             </p>
             <div className="pt-2">
-              <Link href={userId ? "/dashboard" : "/sign-in"}>
+              <Link href={userId ? "/dashboard" : "/sign-in"} className="btn-glow-wrapper rounded-2xl">
                 <Button
                   size="lg"
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-base px-8 h-12 shadow-[0_0_25px_rgba(255,128,0,0.35)]"
+                  className="btn-glow-inner text-white font-bold text-base px-8 h-13 rounded-2xl flex items-center gap-2"
                 >
-                  {userId ? "Go to Dashboard" : "Get Started Now"} <ArrowRight className="h-4 w-4 ml-2" />
+                  {userId ? "Go to Dashboard" : "Get Started Now"} <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
